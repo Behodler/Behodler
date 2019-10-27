@@ -1,9 +1,14 @@
-1. Implement buying and selling for scarcity
-2. Implement buying via scarcity.
-3. Add the version controller address to behodler
-    3.1. Trading of non default version of both Dai and WeiDai locked.
-	3.2  When locked, both can be withdrawn.
-	3.3  Token addresses have a bootstrapped boolean. validator sets the bootstrap amount. Can't be traded until bootstrapped
-	3.4 Bootstrapping is adding min amount an then burning scarcity produced. Min only has to be relatively correct for all the tokens IF scarcity isn't tradable.
-4. Validator determines whether scarcity can be bought or not
+1. Implement buying and selling for scarcity -- BUSY (need to test)
+2. Get Scarcity price of token function --BUSY
+3. Slippage strategy
+4. Implement buying via scarcity.
+5. Add the version controller address to behodler
+    5.1. Trading of non default version of both Dai and WeiDai locked.
+	5.2  When locked, both can be withdrawn.
+	5.3  Token addresses have a bootstrapped boolean. validator sets the bootstrap amount. Can't be traded until bootstrapped
+	5.4 Bootstrapping is adding min amount an then burning scarcity produced. Min only has to be relatively correct for all the tokens IF scarcity isn't tradable.
+6. Validator determines whether scarcity can be bought or not
 
+MATHS
+P=1/(2^64)Q allows me to buy fractional units (continuous) 1 wei buys 1 eth worth which means when Quanity is eth 
+then 1 eth will buy 1 eth with decimal places.

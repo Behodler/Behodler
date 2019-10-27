@@ -9,4 +9,6 @@ interface IValidator
 	function BootstrapValue(address tokenAddress) external view returns (uint);
 	function IsBootStrapped(address tokenAddress) external view returns (bool);
 	function ScarcityPublic() external view returns (bool);
+	function getScarcityAddress () external view returns (address);
+	function getWethAddress() external view returns (address);
 }
