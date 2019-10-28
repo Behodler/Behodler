@@ -16,8 +16,8 @@ contract Scarcity is ERC20, Secondary
 		behodler = b;
 	}
 
-	function mint(uint value) public onlyBehodler{
-		_mint(msg.sender, value);
+	function mint(address recipient, uint value) public onlyBehodler{
+		_mint(recipient, value);
 	}
 
 	function burn (uint value) public {

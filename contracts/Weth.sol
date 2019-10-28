@@ -3,7 +3,7 @@ import "../node_modules/openzeppelin-solidity/contracts/token/ERC20/ERC20.sol";
 import "../node_modules/openzeppelin-solidity/contracts/math/SafeMath.sol";
 
 
-contract MockWeth is ERC20
+contract Weth is ERC20
 {
 	using SafeMath for uint;
 	function deposit () public payable {
