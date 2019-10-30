@@ -2,3 +2,6 @@
 *.example
 /build/
 /temp/
+test/pre*
+test/wei*
+test/version*
