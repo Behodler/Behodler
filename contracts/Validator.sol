@@ -10,9 +10,8 @@ contract Validator is IValidator, Secondary
 	address wethAddress;
 	mapping (address=>bool) validTokens;
 	mapping (address=>bool) burnableTokens;
-	mapping(address=>bool) bootstrapped; //tokens need to be bootstrapped before being traded.
 
-	function setScarcityAddress(address scx) public onlyPrimary{
+	function setScarcity(address scx) public onlyPrimary{
 		scarcityAddress = scx;
 	}
 
@@ -24,7 +23,7 @@ contract Validator is IValidator, Secondary
 		return wethAddress;
 	}
 
-	function setValidAddresses(address weidai, address dai, address weth, bool valid) public onlyPrimary {
+	function setValidTokens(address weidai, address dai, address weth, bool valid) public onlyPrimary {
 		validTokens[weidai] = valid;
 		validTokens[dai] = valid;
 		validTokens[weth] = valid;
@@ -46,17 +45,5 @@ contract Validator is IValidator, Secondary
 
 	function BurnFeePercentage() external view returns (uint){
 		return 1;
-	}
-
-	function BootstrapValue(address tokenAddress) external view returns (uint){
-		return validTokens[tokenAddress]? 50 finney:0;
-	}
-
-	function ScarcityPublic() external view returns (bool){
-		return false;
-	}
-
-	function IsBootStrapped(address tokenAddress) external view returns (bool){
-		return bootstrapped[tokenAddress];
 	}
 }

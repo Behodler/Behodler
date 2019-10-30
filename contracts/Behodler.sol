@@ -11,8 +11,8 @@ import "./Scarcity.sol";
 contract Behodler is Secondary
 {
 	using SafeMath for uint;
-	uint constant factor = 128;
 	using SafeOperations for uint;
+	uint constant factor = 128;
 	uint upperLimit;
 	address validatorAddress;
 	mapping (address=>uint) tokenScarcityObligations;
@@ -22,7 +22,7 @@ contract Behodler is Secondary
 	}
 
 	function calculateAverageScarcityPerToken(address tokenAddress, uint value) public view  returns (uint) { // S/T
-		require (value>0, "Non-zero token value to avoid division by zero.");
+		require (value > 0, "Non-zero token value to avoid division by zero.");
 
 		uint amountToPurchaseWith = value;
 		if(IValidator(validatorAddress).TokenBurnable(tokenAddress) && !IValidator(validatorAddress).FeeExempt(msg.sender)){
@@ -45,7 +45,7 @@ contract Behodler is Secondary
 		return IValidator(validatorAddress).getScarcityAddress();
 	}
 
-	function setValidatorAddress(address valAddress) public onlyPrimary {
+	function setValidator(address valAddress) public onlyPrimary {
 		validatorAddress = valAddress;
 	}
 
@@ -67,9 +67,9 @@ contract Behodler is Secondary
 
 	function trade(address trader, address tokenIn, address tokenOut, uint tokenInValue, uint minPrice, uint maxPrice) private returns (bool){
 		address scarcityAddress = getScarcityAddress();
-		uint balanceBefore = ERC20(scarcityAddress).balanceOf(trader);
+		uint balanceBefore = Scarcity(scarcityAddress).balanceOf(trader);
 		buy(tokenIn,tokenInValue,trader, minPrice);
-		uint scarcityToSpend = ERC20(scarcityAddress).balanceOf(trader) - balanceBefore;
+		uint scarcityToSpend = Scarcity(scarcityAddress).balanceOf(trader) - balanceBefore;
 		sell(tokenOut,scarcityToSpend,trader, maxPrice);
 		return true;
 	}
@@ -84,7 +84,7 @@ contract Behodler is Secondary
 
 	function buy (address tokenAddress, uint value, address purchaser, uint minPrice) private returns (bool){
 		require(IValidator(validatorAddress).TokenValid(tokenAddress), "token not tradeable.");
-		ERC20(tokenAddress).transferFrom(purchaser,address(this),value);
+		ERC20(tokenAddress).transferFrom(purchaser, address(this),value);
 		uint amountToPurchaseWith = value;
 		if(IValidator(validatorAddress).TokenBurnable(tokenAddress) && !IValidator(validatorAddress).FeeExempt(purchaser)){
 			uint fee = IValidator(validatorAddress).BurnFeePercentage().mul(value)/100;
@@ -103,14 +103,15 @@ contract Behodler is Secondary
 		address scarcityAddress = getScarcityAddress();
 		//bookkeeping
 		tokenScarcityObligations[tokenAddress] = finalScarcity;
-		//issue scarcity, take tokens
+		//issue scarcity
 		Scarcity(scarcityAddress).mint(msg.sender, scarcityToPrint);
 	}
 
 	function sell (address tokenAddress, uint scarcityValue, address seller, uint maxPrice) private returns (bool){
 		require(IValidator(validatorAddress).TokenValid(tokenAddress) || msg.sender == primary(), "token not tradeable.");
-		ERC20(IValidator(validatorAddress).getScarcityAddress()).transferFrom(seller,address(this), scarcityValue);
 		address scarcityAddress = getScarcityAddress();
+		Scarcity(scarcityAddress).transferToBehodler(seller, scarcityValue);
+	
 		uint currentObligation = tokenScarcityObligations[tokenAddress];
 
 		uint scarcityToSpend = scarcityValue.mul(100-ScarcityBurnFeePercentage(tokenAddress)).div(10000);
