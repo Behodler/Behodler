@@ -1,9 +1,9 @@
-1. Implement buying and selling for scarcity -- BUSY (need to test)
-2. Get Scarcity price of token function --BUSY
+1. Implement buying and selling for scarcity -- DONE (need to test)
+2. Get Scarcity price of token function --DONE
 3. Slippage strategy -- DONE
-4. Implement buying via scarcity. --BUSY
+4. Implement buying via scarcity. --DONE
 6. Validator determines whether scarcity can be bought or not --DONE
-7. Migrations - link safeOperations and safeMath libraries
+7. Migrations - development done
 8. Tests - observe every require statement to test boundaries and remember slippage.
 9. On front end play around with factor and upper limit in kovan to get the right feel. 10% initial burn might be a bit intense.
 

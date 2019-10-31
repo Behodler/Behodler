@@ -8,7 +8,7 @@ contract Scarcity is ERC20, Secondary
 	address behodler;
 	modifier onlyBehodler(){
 		require(behodler != address(0), "Behodler contract not set.");
-		require(msg.sender == behodler, "only the Behodler contract can invoke this function.");
+		require(msg.sender == behodler, "Only the Behodler contract can invoke this function.");
 		_;
 	}
 
