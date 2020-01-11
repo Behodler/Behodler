@@ -7,10 +7,9 @@ const setup = async.setup
 const scarcity = artifacts.require("Scarcity")
 let primary = ""
 contract('Scarcity', accounts => {
-	var scarcityInstance, behodlerInstance
+	var scarcityInstance
 	setup(async () => {
 		scarcityInstance = await scarcity.deployed()
-		behodlerInstance = await behodler.deployed()
 		primary = accounts[0]
 	})
 
