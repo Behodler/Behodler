@@ -1,11 +1,10 @@
-1. Implement buying and selling for scarcity -- DONE (need to test)
-2. Get Scarcity price of token function --DONE
-3. Slippage strategy -- DONE
-4. Implement buying via scarcity. --DONE
-6. Validator determines whether scarcity can be bought or not --DONE
-7. Migrations - development done
-8. Tests - observe every require statement to test boundaries and remember slippage.
-9. On front end play around with factor and upper limit in kovan to get the right feel. 10% initial burn might be a bit intense.
+Behodler things to remember:
+1. Slippage strategy
+2. Only buy and sell for scarcity
+
+hephaestus:
+
+
 
 MATHS
 P=1/(2^64)Q allows me to buy fractional units (continuous) 1 wei buys 1 eth worth which means when Quantity is eth 
