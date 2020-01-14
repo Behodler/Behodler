@@ -1,11 +1,9 @@
 pragma solidity  0.5;
-import "../node_modules/openzeppelin-solidity/contracts/token/ERC20/ERC20.sol";
-import "../node_modules/openzeppelin-solidity/contracts/math/SafeMath.sol";
+import "../../node_modules/openzeppelin-solidity/contracts/token/ERC20/ERC20.sol";
 
 
-contract Weth is ERC20
+contract MockWeth is ERC20
 {
-	using SafeMath for uint;
 	function deposit () public payable {
 		_mint(msg.sender,msg.value);
 	}

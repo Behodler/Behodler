@@ -1,9 +1,9 @@
-pragma solidity 0.5.11;
+pragma solidity 0.5;
 import "../../node_modules/openzeppelin-solidity/contracts/ownership/Secondary.sol";
-import "../../node_modules/openzeppelin-solidity/contracts/token/ERC20/ERC20.sol";
 import "../../node_modules/openzeppelin-solidity/contracts/math/SafeMath.sol";
 import "./Validator.sol";
-import "./PyroTokenLike.sol";
+import "../contractFacades/PyroTokenLike.sol";
+import "../contractFacades/ERC20Like.sol";
 /*
 	A bellow is the reserve of a Pyrotoken. It contains the base token. 
 	When a bellow is added to, it is 'opened'. When a pyrotoken is redeemed, the bellow 'blasts'.
@@ -24,18 +24,18 @@ contract Bellows is Secondary {
 
 	function blast(address pyroToken, uint value) public {
 		require(validator.tokens(pyroToken),"token not a valid pyrotoken");
-		require(ERC20(pyroToken).transferFrom(msg.sender,address(this),value),"Transfer from holder failed");
+		require(ERC20Like(pyroToken).transferFrom(msg.sender,address(this),value),"Transfer from holder failed");
 		require(PyroTokenLike(pyroToken).burn(value),"could not burn pyrotoken");
 		require(PyroTokenLike(pyroToken).bellows() == address(this),"pyroToken reserve mismatch");
 		uint redeemRate = getRedeemRate(pyroToken);
 		uint baseTokenPayable = value.mul(redeemRate).div(10000);
 		address baseTokenAddress = PyroTokenLike(pyroToken).baseToken();
-		require(ERC20(baseTokenAddress).transfer(msg.sender,baseTokenPayable),"unable to pay base token from reserve");
+		require(ERC20Like(baseTokenAddress).transfer(msg.sender,baseTokenPayable),"unable to pay base token from reserve");
 	}
 
 	function getRedeemRate(address pyroToken) public view returns (uint) {//pyroPerMyriadToken
-		uint pyroTotalSupply = ERC20(pyroToken).totalSupply();
-		uint baseTotalSupply = ERC20(PyroTokenLike(pyroToken).baseToken()).totalSupply();
+		uint pyroTotalSupply = ERC20Like(pyroToken).totalSupply();
+		uint baseTotalSupply = ERC20Like(PyroTokenLike(pyroToken).baseToken()).totalSupply();
 
 		if(pyroTotalSupply == 0)
 			return 100;
@@ -46,7 +46,7 @@ contract Bellows is Secondary {
 	}
 
 	function withdrawDonations(address token) public {
-		uint balance = ERC20(token).balanceOf(address(this));
-		ERC20(token).transfer(donationAddress,balance);
+		uint balance = ERC20Like(token).balanceOf(address(this));
+		ERC20Like(token).transfer(donationAddress,balance);
 	}
 }

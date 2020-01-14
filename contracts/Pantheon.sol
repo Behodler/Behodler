@@ -1,3 +1,0 @@
-/*
-	Pantheon is the contract which authenticates which tokens are acceptable to Behodler
- */

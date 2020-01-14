@@ -1,9 +1,9 @@
-pragma solidity 0.5.11;
+pragma solidity 0.5;
 import "../../node_modules/openzeppelin-solidity/contracts/token/ERC20/ERC20.sol";
 import "../../node_modules/openzeppelin-solidity/contracts/ownership/Secondary.sol";
 import "./Bellows.sol";
 import "./PyroTokenRegistry.sol";
-import "./PatienceRegulationEngineLike.sol";
+import "../contractFacades/PatienceRegulationEngineLike.sol";
 /*
 PyroTokens wrap tokens traded on Behodler (except for Dai, WeiDai and Scarcity).
 PyroTokens are ERC20 tokens that can engulf (wrap) a token. The base token is then added to a Bellow by opening it.
@@ -31,8 +31,8 @@ contract PyroToken is Secondary, ERC20{
 		return 18;
 	}
 
-	function wrap (address sender, uint value) public returns (bool) {
-		require(baseToken.transferFrom(sender,address(this),value),"transfer of base token from sender failed");
+	function engulf (address sender, uint value) public returns (bool) {
+		require(baseToken.transferFrom(msg.sender,address(this),value),"transfer of base token from sender failed");
 		uint redeemRate = bellows.getRedeemRate(address(this));
 		uint pyroToProduce = value.mul(10000).div(redeemRate);
 		_mint(sender,pyroToProduce);

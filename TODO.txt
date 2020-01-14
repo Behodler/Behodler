@@ -1,8 +1,4 @@
-Behodler things to remember:
-1. Slippage strategy
-2. Only buy and sell for scarcity
-
-hephaestus:
+For next time: implement ether trading in Janus and Chronos stamping in Behodler
 
 
 

@@ -1,11 +1,11 @@
-pragma solidity 0.5.11;
+pragma solidity 0.5;
 import "../../node_modules/openzeppelin-solidity/contracts/ownership/Secondary.sol";
 import "./PyroToken.sol";
 import "./Validator.sol";
 
 contract PyroTokenRegistry is Secondary{
 	address public PatienceRegulationEngine;
-	mapping (string=>address) public tokens;
+	mapping (address=>address) public baseTokenMapping;
 	address public bellows;
 	Validator validator;
 
@@ -18,7 +18,7 @@ contract PyroTokenRegistry is Secondary{
 		require(validator.tokens(baseToken),"invalid token");
 		PyroToken t = new PyroToken();
 		t.seed(name, symbol, baseToken, bellows, address(this));
-		tokens[name] = address(t);
+		baseTokenMapping[baseToken] = address(t);
 		require(address(t) != address(0),"deploy contract failed");
 	}
 }
