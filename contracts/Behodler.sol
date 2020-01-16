@@ -21,11 +21,13 @@ contract Behodler is Secondary
 	uint constant factor = 128;
 	Validator validator;
 	Kharon kharon;
+	address janus;
 	mapping (address=>uint) public tokenScarcityObligations; //marginal scarcity price of token
 
-	function seed(address validatorAddress, address kharonAddress) public onlyPrimary {
+	function seed(address validatorAddress, address kharonAddress, address janusAddress) public onlyPrimary {
 		kharon = Kharon(kharonAddress);
 		validator = Validator(validatorAddress);
+		janus = janusAddress;
 	}
 
 	function calculateAverageScarcityPerToken(address tokenAddress, uint value) public view  returns (uint) { // S/T
@@ -42,6 +44,16 @@ contract Behodler is Secondary
 
 	function getScarcityAddress() private view returns (address){
 		return address(validator.scarcity);
+	}
+
+	function buyScarcity(address sender, address tokenAddress, uint value, uint minPrice) public returns (uint){
+		require(msg.sender == janus, "External users forbidden from delegating trade.");
+		return buy(tokenAddress,value,sender, minPrice);
+	}
+
+	function sellScarcity(address sender, address tokenAddress, uint value, uint maxPrice) public returns (uint){
+		require(msg.sender == janus, "External users forbidden from delegating trade.");
+		return sell(tokenAddress,value,sender, maxPrice);
 	}
 
 	function buyScarcity(address tokenAddress, uint value, uint minPrice) public returns (uint){
