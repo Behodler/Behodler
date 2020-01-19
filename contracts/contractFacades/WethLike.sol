@@ -3,6 +3,6 @@ import "./ERC20Like.sol";
 
 abstract contract WethLike is ERC20Like
 {
-	function deposit () public payable virtual;
-	function withdraw(uint value) public virtual;
+	function deposit () external payable virtual;
+	function withdraw(uint value) external virtual;
 }

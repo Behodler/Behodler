@@ -23,13 +23,13 @@ contract Behodler is Secondary
 	address janus;
 	mapping (address=>uint) public tokenScarcityObligations; //marginal scarcity price of token
 
-	function seed(address validatorAddress, address kharonAddress, address janusAddress) public onlyPrimary {
+	function seed(address validatorAddress, address kharonAddress, address janusAddress) external onlyPrimary {
 		kharon = Kharon(kharonAddress);
 		validator = Validator(validatorAddress);
 		janus = janusAddress;
 	}
 
-	function calculateAverageScarcityPerToken(address tokenAddress, uint value) public view  returns (uint) { // S/T
+	function calculateAverageScarcityPerToken(address tokenAddress, uint value) external view  returns (uint) { // S/T
 		require (value > 0, "Non-zero token value to avoid division by zero.");
 
 		uint amountToPurchaseWith = value.sub(kharon.toll(tokenAddress,value));
@@ -45,21 +45,21 @@ contract Behodler is Secondary
 		return validator.scarcity.address;
 	}
 
-	function buyScarcity(address sender, address tokenAddress, uint value, uint minPrice) public returns (uint){
+	function buyScarcity(address sender, address tokenAddress, uint value, uint minPrice) external returns (uint){
 		require(msg.sender == janus, "External users forbidden from delegating trade.");
 		return buy(tokenAddress,value,sender, minPrice);
 	}
 
-	function sellScarcity(address sender, address tokenAddress, uint value, uint maxPrice) public returns (uint){
+	function sellScarcity(address sender, address tokenAddress, uint value, uint maxPrice) external returns (uint){
 		require(msg.sender == janus, "External users forbidden from delegating trade.");
 		return sell(tokenAddress,value,sender, maxPrice);
 	}
 
-	function buyScarcity(address tokenAddress, uint value, uint minPrice) public returns (uint){
+	function buyScarcity(address tokenAddress, uint value, uint minPrice) external returns (uint){
 		return buy(tokenAddress,value,msg.sender, minPrice);
 	}
 
-	function sellScarcity(address tokenAddress, uint value, uint maxPrice) public returns (uint){
+	function sellScarcity(address tokenAddress, uint value, uint maxPrice) external returns (uint){
 		return sell(tokenAddress,value,msg.sender, maxPrice);
 	}
 

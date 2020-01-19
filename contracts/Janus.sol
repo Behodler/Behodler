@@ -21,14 +21,14 @@ contract Janus is Secondary{
 	constructor () public {
 		self = address(this);
 	}
-	function seed (address scx, address wet, address beh) public onlyPrimary {
+	function seed (address scx, address wet, address beh) external onlyPrimary {
 		weth = WethLike(wet);
 		scarcityAddress = scx;
 		behodler = Behodler(beh);
 	}
 
 	//user must authorize behodler
-	function tokenToToken(address input, address output, uint value, uint minPrice, uint maxPrice) public returns (uint bought) {
+	function tokenToToken(address input, address output, uint value, uint minPrice, uint maxPrice) external returns (uint bought) {
 		return tokenToToken(msg.sender,input,output,value,minPrice,maxPrice);
 	}
 
@@ -44,13 +44,13 @@ contract Janus is Secondary{
 		}
 	}
 
-	function ethToToken(address output, uint minPrice, uint maxPrice) public payable returns (uint bought) {
+	function ethToToken(address output, uint minPrice, uint maxPrice) external payable returns (uint bought) {
 		weth.deposit.value(msg.value); //send eth?
 		weth.transfer(msg.sender,msg.value);
 		bought = tokenToToken(msg.sender,address(weth),output,msg.value,minPrice,maxPrice);
 	}
 
-	function tokenToEth(address input, uint value, uint minPrice, uint maxPrice) public returns (uint bought) {//user must authorize weth for Janus
+	function tokenToEth(address input, uint value, uint minPrice, uint maxPrice) external returns (uint bought) {//user must authorize weth for Janus
 		bought = tokenToToken(msg.sender, input, address(weth),value,minPrice,maxPrice);
 		weth.transferFrom(msg.sender,self,bought);
 		weth.withdraw(bought);

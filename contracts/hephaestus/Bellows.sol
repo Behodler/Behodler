@@ -13,16 +13,11 @@ import "../contractFacades/ERC20Like.sol";
 contract Bellows is Secondary {
 	using SafeMath for uint;
 	Validator validator;
-	address public donationAddress;
-	function setValidator(address v) public onlyPrimary {
+	function setValidator(address v) external onlyPrimary {
 		validator = Validator(v);
 	}
 
-	function setDonationAddress (address d) public onlyPrimary (){
-		donationAddress = d;
-	}
-
-	function blast(address pyroToken, uint value) public {
+	function blast(address pyroToken, uint value) external {
 		require(validator.tokens(pyroToken),"token not a valid pyrotoken");
 		require(ERC20Like(pyroToken).transferFrom(msg.sender,address(this),value),"Transfer from holder failed");
 		require(PyroTokenLike(pyroToken).burn(value),"could not burn pyrotoken");
@@ -43,10 +38,5 @@ contract Bellows is Secondary {
 		return baseTotalSupply
 		.mul(10000) //scale by a myriad
 		.div(pyroTotalSupply);
-	}
-
-	function withdrawDonations(address token) public {
-		uint balance = ERC20Like(token).balanceOf(address(this));
-		ERC20Like(token).transfer(donationAddress,balance);
 	}
 }

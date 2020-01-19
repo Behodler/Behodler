@@ -1,4 +1,5 @@
 pragma solidity ^0.6.1;
+
 import "./hephaestus/Bellows.sol";
 import "./contractFacades//PatienceRegulationEngineLike.sol";
 import "./contractFacades/WeiDaiBankLike.sol";
@@ -29,7 +30,7 @@ contract Kharon is Secondary{
 	address donationAddress;
 	uint scarcityBurnCuttoff;
 
-	function seed (address bl, address bh, address pm, address pr, address ban,address dai, address scar, uint cut, address d) public onlyPrimary {
+	function seed (address bl, address bh, address pm, address pr, address ban,address dai, address scar, uint cut, address d) external onlyPrimary {
 		bellows = Bellows(bl);
 		behodler = Behodler(bh);
 		prometheus = Prometheus(pm);
@@ -49,7 +50,7 @@ contract Kharon is Secondary{
 		return 0;
 	}
 
-	function demandPayment (address token, uint value, address buyer) public returns (uint) {
+	function demandPayment (address token, uint value, address buyer) external returns (uint) {
 		require(msg.sender == address(behodler), "only Behodler can invoke this function");
 		uint tollValue = toll(token,value);
 		if(tollValue == 0)
@@ -71,7 +72,7 @@ contract Kharon is Secondary{
 		return tollValue;
 	}
 
-	function withdrawDonations(address token) public onlyPrimary{
+	function withdrawDonations(address token) external onlyPrimary{
 		require(donationAddress != address(0),"donation address not set");
 		uint balance = ERC20Like(token).balanceOf(address(this));
 		if(balance>0)

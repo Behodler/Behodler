@@ -35,7 +35,7 @@ contract Prometheus is Secondary {
 		tokenRegistry = PyroTokenRegistry(registry);
 	}
 
-	function stealFlame(address token, uint kharonToll, address buyer) public returns (uint){//takes from behodler and returns amountTakenNum
+	function stealFlame(address token, uint kharonToll, address buyer) external returns (uint){//takes from behodler and returns amountTakenNum
 		require(msg.sender == kharonAddress,"only Kharon can invoke this function");
 		if(token == scarcity || token == weiDai || token == dai)
 			return 0;

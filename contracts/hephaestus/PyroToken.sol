@@ -19,7 +19,7 @@ contract PyroToken is Secondary, ERC20{
 	Bellows public bellows;
 	PyroTokenRegistry public registry;
 
-	function seed(string memory n, string memory s, address base, address bellow, address r) public onlyPrimary{
+	function seed(string calldata n, string calldata s, address base, address bellow, address r) external onlyPrimary{
 		name = n;
 		symbol = s;
 		baseToken = ERC20(base);
@@ -27,18 +27,18 @@ contract PyroToken is Secondary, ERC20{
 		registry = PyroTokenRegistry(r);
 	}
 
-	function decimals() public pure returns (uint8) {
+	function decimals() external pure returns (uint8) {
 		return 18;
 	}
 
-	function engulf (address sender, uint value) public returns (bool) {
+	function engulf (address sender, uint value) external returns (bool) {
 		require(baseToken.transferFrom(msg.sender,address(this),value),"transfer of base token from sender failed");
 		uint redeemRate = bellows.getRedeemRate(address(this));
 		uint pyroToProduce = value.mul(10000).div(redeemRate);
 		_mint(sender,pyroToProduce);
 	}
 
-	function burn (uint value) public returns (bool) {
+	function burn (uint value) external returns (bool) {
 		_burn(msg.sender, value);
 		uint splitRate = PatienceRegulationEngineLike(registry.PatienceRegulationEngine()).getDonationSplit(msg.sender);
 		uint donation = splitRate.mul(value).div(100);

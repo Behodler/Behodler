@@ -12,32 +12,32 @@ contract Scarcity is ERC20, Secondary
 		_;
 	}
 
-	function setBehodler(address b) public onlyPrimary {
+	function setBehodler(address b) external onlyPrimary {
 		behodler = b;
 	}
 
-	function mint(address recipient, uint value) public onlyBehodler{
+	function mint(address recipient, uint value) external onlyBehodler{
 		_mint(recipient, value);
 	}
 
-	function burn (uint value) public {
+	function burn (uint value) external {
 		_burn(msg.sender,value);
 	}
 
-	function transferToBehodler(address holder, uint value) public returns (bool){
+	function transferToBehodler(address holder, uint value) external returns (bool){
 		_transfer(holder, behodler, value);
 		return true;
 	}
 
-	function name() public pure returns (string memory) {
+	function name() external pure returns (string memory) {
 		return "Scarcity";
 	}
 
-	function symbol() public pure returns (string memory) {
+	function symbol() external pure returns (string memory) {
 		return "SCX";
 	}
 
-	function decimals() public pure returns (uint8) {
+	function decimals() external pure returns (uint8) {
 		return 18;
 	}
 }

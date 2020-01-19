@@ -5,8 +5,8 @@ PyroTokens are ERC20 tokens that can engulf (wrap) a token. The base token is th
 Unwrapping happens at the Bellows as a 'blast'.
 */
 abstract contract PyroTokenLike {
-	function bellows() public virtual view returns (address);
-	function baseToken() public virtual view returns (address);
-	function engulf (address sender, uint value) public virtual returns (bool);
-	function burn (uint value) public virtual returns (bool);
+	function bellows() external virtual view returns (address);
+	function baseToken() external virtual view returns (address);
+	function engulf (address sender, uint value) external virtual returns (bool);
+	function burn (uint value) external virtual returns (bool);
 }

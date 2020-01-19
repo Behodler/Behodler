@@ -1,3 +1,6 @@
+pragma solidity ^0.6.1;
+import "../node_modules/openzeppelin-solidity/contracts/math/SafeMath.sol";
+import "./Behodler.sol";
 /*
 	Chronos is an oracle that records the trades of Behodler over time.
 	While one would think that logging would suffice, this isn't accessible to contracts.
@@ -7,3 +10,20 @@
 	just inverted and added to the [X][Y] running average.
  */
 
+struct Averages {
+	uint moving10;
+	uint moving100;
+	uint moving1000;
+}
+
+contract Chronos {
+	Behodler behodler;
+	using SafeMath for uint;
+	mapping (address => mapping (address=> mapping (uint=>Averages))) public stampData;
+
+	function seed (address beh) external {
+		behodler = Behodler(beh);
+	}
+
+
+}
