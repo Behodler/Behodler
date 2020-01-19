@@ -1,7 +1,7 @@
-pragma solidity 0.5;
+pragma solidity ^0.6.1;
 
-contract PatienceRegulationEngineLike{
-	function getDonationSplit(address user) public view returns (uint);
-	function buyWeiDai(uint dai, uint split) public;
-	function claimWeiDai() public;
+abstract contract PatienceRegulationEngineLike{
+	function getDonationSplit(address user) public virtual view returns (uint);
+	function buyWeiDai(uint dai, uint split) public virtual;
+	function claimWeiDai() public virtual;
 }

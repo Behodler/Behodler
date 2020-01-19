@@ -1,6 +1,10 @@
-For next time: implement ether trading in Janus and Chronos stamping in Behodler
+For next time: implement Chronos stamping in Behodler
 
-
+Next:
+Behodler must approve kharon. --DONE
+Kharon must approve Prometheus --DONE
+Kharon must have a donation address -- DONE
+Check behodler maths
 
 MATHS
 P=1/(2^64)Q allows me to buy fractional units (continuous) 1 wei buys 1 eth worth which means when Quantity is eth 

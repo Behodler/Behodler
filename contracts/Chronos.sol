@@ -6,3 +6,4 @@
 	Trading pairs can be held as mapping(address=>mapping(address=uint)). If a pair of [X][Y] has a non zero value and a [Y][X] trade comes in, then it is
 	just inverted and added to the [X][Y] running average.
  */
+

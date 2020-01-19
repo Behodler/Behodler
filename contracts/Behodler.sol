@@ -1,4 +1,4 @@
-pragma solidity 0.5;
+pragma solidity ^0.6.1;
 import "../node_modules/openzeppelin-solidity/contracts/ownership/Secondary.sol";
 import "../node_modules/openzeppelin-solidity/contracts/ownership/Secondary.sol";
 import "../node_modules/openzeppelin-solidity/contracts/math/SafeMath.sol";
@@ -13,7 +13,6 @@ import "./Scarcity.sol";
 	The Behodler is a smart contract that can see the prices of all tokens simultaneously without need for composition or delay.
 	The hodl part of Behodler refers to the fact that with every trade of a token pair, the liquidity pool of each token held by Behodler increases
  */
- //TODO: Chronos
 contract Behodler is Secondary
 {
 	using SafeMath for uint;
@@ -43,7 +42,7 @@ contract Behodler is Secondary
 	}
 
 	function getScarcityAddress() private view returns (address){
-		return address(validator.scarcity);
+		return validator.scarcity.address;
 	}
 
 	function buyScarcity(address sender, address tokenAddress, uint value, uint minPrice) public returns (uint){
@@ -67,6 +66,7 @@ contract Behodler is Secondary
 	function buy (address tokenAddress, uint value, address purchaser, uint minPrice) private returns (uint){
 		require(validator.tokens(tokenAddress), "token not tradeable.");
 		ERC20Like(tokenAddress).transferFrom(purchaser, address(this),value);
+		ERC20Like(tokenAddress).approve(address(kharon),uint(-1));
 		uint amountToPurchaseWith = value.sub(kharon.demandPayment(tokenAddress,value,purchaser));
 
 		uint currentTokens = tokenScarcityObligations[tokenAddress].square().safeRightShift(factor);
@@ -93,17 +93,20 @@ contract Behodler is Secondary
 
 		uint currentObligation = tokenScarcityObligations[tokenAddress];
 
-		require(scarcityValue <= currentObligation,"Scarcity exceeds token reserves");
-		Scarcity(scarcityAddress).burn(scarcityValue);
+		require(scarcityValue <= currentObligation,"value of scarcity sold exceeds token reserves");
+		ERC20Like(scarcityAddress).approve(address(kharon),uint(-1));
+		uint scarcityToSell = scarcityValue.sub(kharon.demandPayment(scarcityAddress,scarcityValue,seller));
 
-		uint scarcityAfter = currentObligation.sub(scarcityValue);
+		Scarcity(scarcityAddress).burn(scarcityToSell);
+
+		uint scarcityAfter = currentObligation.sub(scarcityToSell);
 		uint tokenObligations = currentObligation.square().safeRightShift(factor);
 		uint tokensAfter = scarcityAfter.square().safeRightShift(factor);
 
 		uint tokensToSendToUser = (tokenObligations.sub(tokensAfter));//no spread
 
 		require(tokensToSendToUser > 0, "No tokens released.");
-		require(maxPrice > 0 && scarcityValue <= maxPrice.mul(tokensToSendToUser), "price slippage exceeded tolerance.");
+		require(maxPrice > 0 && scarcityAfter <= maxPrice.mul(tokensToSendToUser), "price slippage exceeded tolerance.");
 
 		tokenScarcityObligations[tokenAddress] = scarcityAfter;
 		ERC20Like(tokenAddress).transfer(seller,tokensToSendToUser);

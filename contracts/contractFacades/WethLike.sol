@@ -1,8 +1,8 @@
-pragma solidity 0.5;
+pragma solidity ^0.6.1;
 import "./ERC20Like.sol";
 
-contract WethLike is ERC20Like
+abstract contract WethLike is ERC20Like
 {
-	function deposit () public payable;
-	function withdraw(uint value) public;
+	function deposit () public payable virtual;
+	function withdraw(uint value) public virtual;
 }

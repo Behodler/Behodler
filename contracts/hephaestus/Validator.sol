@@ -1,4 +1,4 @@
-pragma solidity 0.5;
+pragma solidity ^0.6.1;
 import "../../node_modules/openzeppelin-solidity/contracts/ownership/Secondary.sol";
 import "../Scarcity.sol";
 

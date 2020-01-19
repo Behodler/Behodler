@@ -1,5 +1,5 @@
-pragma solidity 0.5;
+pragma solidity ^0.6.1;
 
-contract WeiDaiBankLike {
-	function redeemWeiDai(uint weiDai) external;
+abstract contract WeiDaiBankLike {
+	function redeemWeiDai(uint weiDai) external virtual;
 }

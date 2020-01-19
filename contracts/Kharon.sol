@@ -1,4 +1,4 @@
-pragma solidity 0.5;
+pragma solidity ^0.6.1;
 import "./hephaestus/Bellows.sol";
 import "./contractFacades//PatienceRegulationEngineLike.sol";
 import "./contractFacades/WeiDaiBankLike.sol";
@@ -26,37 +26,55 @@ contract Kharon is Secondary{
 	address WeiDaiBank;
 	address Dai;
 	address Scarcity;
+	address donationAddress;
 	uint scarcityBurnCuttoff;
 
-	function seed (address bl, address bh, address pm, address pre, address bank,address dai, address scarcity, uint cutoff) public onlyPrimary {
+	function seed (address bl, address bh, address pm, address pr, address ban,address dai, address scar, uint cut, address d) public onlyPrimary {
 		bellows = Bellows(bl);
 		behodler = Behodler(bh);
 		prometheus = Prometheus(pm);
-		PatienceRegulationEngine = PatienceRegulationEngineLike(pre);
-		WeiDaiBank = bank;
+		PatienceRegulationEngine = PatienceRegulationEngineLike(pr);
+		WeiDaiBank = ban;
 		Dai = dai;
-		Scarcity = scarcity;
-		scarcityBurnCuttoff = cutoff;
+		Scarcity = scar;
+		scarcityBurnCuttoff = cut;
+		donationAddress = d;
 	}
 
 	function toll(address token, uint value) public view returns (uint){//percentage expressed as number between 0 and 1000
+		//if the token isn't scarcity, we burn 2.4%. If it is scarcity, we first check if we should burn anymore
 		if(token != Scarcity || behodler.tokenScarcityObligations(token)<=scarcityBurnCuttoff){
 			return uint(24).mul(value).div(1000);
 		}
+		return 0;
 	}
 
 	function demandPayment (address token, uint value, address buyer) public returns (uint) {
 		require(msg.sender == address(behodler), "only Behodler can invoke this function");
 		uint tollValue = toll(token,value);
+		if(tollValue == 0)
+			return 0;
 		require(ERC20Like(token).transferFrom(msg.sender,address(this), tollValue),"toll taking failed");
+		ERC20Like(token).approve(address(prometheus),uint(-1));
 		uint reward = prometheus.stealFlame(token,tollValue, buyer);
 		uint amountToBurn = tollValue.sub(reward);
+		//get split rate and calculate portion to burn. Remaining is a donation
+		uint netSplitRate = uint(100).sub(PatienceRegulationEngine.getDonationSplit(buyer));
+		amountToBurn = amountToBurn.mul(100).div(netSplitRate);
+
 		if(token == Dai){
 			PatienceRegulationEngine.buyWeiDai(amountToBurn,PatienceRegulationEngine.getDonationSplit(buyer));
 			PatienceRegulationEngine.claimWeiDai();
 		}else {
-			PyroTokenLike(token).burn(amountToBurn);
+			PyroTokenLike(token).burn(amountToBurn); //burns either pyrotokens or scarcity
 		}
 		return tollValue;
+	}
+
+	function withdrawDonations(address token) public onlyPrimary{
+		require(donationAddress != address(0),"donation address not set");
+		uint balance = ERC20Like(token).balanceOf(address(this));
+		if(balance>0)
+			ERC20Like(token).transfer(donationAddress,balance);
 	}
 }
