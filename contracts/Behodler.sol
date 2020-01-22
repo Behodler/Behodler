@@ -7,6 +7,7 @@ import "./Kharon.sol";
 import "./contractFacades/ERC20Like.sol";
 import "./libraries/SafeOperations.sol";
 import "./Scarcity.sol";
+import "./Chronos.sol";
 /*
 	Behodler orchestrates trades using an omnischedule bonding curve.
 	The name is inspired by the Beholder of D&D, a monster with multiple arms ending in eyes seeing in all directions.
@@ -20,17 +21,19 @@ contract Behodler is Secondary
 	uint constant factor = 128;
 	Validator validator;
 	Kharon kharon;
+	Chronos chronos;
 	address janus;
 	mapping (address=>uint) public tokenScarcityObligations; //marginal scarcity price of token
 
-	function seed(address validatorAddress, address kharonAddress, address janusAddress) external onlyPrimary {
+	function seed(address validatorAddress, address kharonAddress, address janusAddress, address chronosAddress) external onlyPrimary {
 		kharon = Kharon(kharonAddress);
 		validator = Validator(validatorAddress);
 		janus = janusAddress;
+		chronos = Chronos(chronosAddress);
 	}
 
-	function calculateAverageScarcityPerToken(address tokenAddress, uint value) external view  returns (uint) { // S/T
-		require (value > 0, "Non-zero token value to avoid division by zero.");
+	function calculateAverageScarcityPerToken(address tokenAddress, uint value) external view returns (uint) { // S/T
+		require (value > 0, "Non-zero token value expected to avoid division by zero.");
 
 		uint amountToPurchaseWith = value.sub(kharon.toll(tokenAddress,value));
 
@@ -111,6 +114,7 @@ contract Behodler is Secondary
 		tokenScarcityObligations[tokenAddress] = scarcityAfter;
 		ERC20Like(tokenAddress).transfer(seller,tokensToSendToUser);
 		emit scarcitySold(tokenAddress,scarcityValue, tokensToSendToUser);
+		chronos.stamp(tokenAddress,scarcityValue,tokensToSendToUser);
 		return tokensToSendToUser;
 	}
 

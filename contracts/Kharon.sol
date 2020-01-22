@@ -6,6 +6,7 @@ import "./contractFacades/WeiDaiBankLike.sol";
 import "./Behodler.sol";
 import "./Prometheus.sol";
 import "./contractFacades/PyroTokenLike.sol";
+import "./hephaestus/PyroTokenRegistry.sol";
 import "../node_modules/openzeppelin-solidity/contracts/ownership/Secondary.sol";
 import "./contractFacades/ERC20Like.sol";
 import "../node_modules/openzeppelin-solidity/contracts/math/SafeMath.sol";
@@ -24,6 +25,7 @@ contract Kharon is Secondary{
 	Behodler public behodler;
 	Prometheus public prometheus;
 	PatienceRegulationEngineLike PatienceRegulationEngine;
+	PyroTokenRegistry public tokenRegistry;
 	address WeiDaiBank;
 	address Dai;
 	address Scarcity;
@@ -34,6 +36,7 @@ contract Kharon is Secondary{
 		bellows = Bellows(bl);
 		behodler = Behodler(bh);
 		prometheus = Prometheus(pm);
+		tokenRegistry = prometheus.tokenRegistry();
 		PatienceRegulationEngine = PatienceRegulationEngineLike(pr);
 		WeiDaiBank = ban;
 		Dai = dai;
@@ -44,7 +47,7 @@ contract Kharon is Secondary{
 
 	function toll(address token, uint value) public view returns (uint){//percentage expressed as number between 0 and 1000
 		//if the token isn't scarcity, we burn 2.4%. If it is scarcity, we first check if we should burn anymore
-		if(token != Scarcity || behodler.tokenScarcityObligations(token)<=scarcityBurnCuttoff){
+		if(token != Scarcity || behodler.tokenScarcityObligations(token) <= scarcityBurnCuttoff){
 			return uint(24).mul(value).div(1000);
 		}
 		return 0;
@@ -66,8 +69,10 @@ contract Kharon is Secondary{
 		if(token == Dai){
 			PatienceRegulationEngine.buyWeiDai(amountToBurn,PatienceRegulationEngine.getDonationSplit(buyer));
 			PatienceRegulationEngine.claimWeiDai();
-		}else {
+		}else if(token == Scarcity) {
 			PyroTokenLike(token).burn(amountToBurn); //burns either pyrotokens or scarcity
+		} else if(tokenRegistry.baseTokenMapping(token) != address(0)){
+			bellows.open(token,amountToBurn);
 		}
 		return tollValue;
 	}

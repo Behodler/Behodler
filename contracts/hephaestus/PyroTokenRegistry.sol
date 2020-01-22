@@ -10,7 +10,7 @@ contract PyroTokenRegistry is Secondary{
 	address public bellows;
 	Validator validator;
 
-	function seed(address b, address v) external {
+	function seed(address b, address v) external onlyPrimary {
 		bellows = b;
 		validator = Validator(v);
 	}

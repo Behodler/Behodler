@@ -22,7 +22,7 @@ contract('Scarcity', accounts => {
 	})
 
 	test("calculateAverageScarcityPerToken with zero value should fail", async () => {
-	
+		await expectThrow(behodlerInstance.calculateAverageScarcityPerToken(mock2Instance.address, "0", { from: primary }), 'Non-zero token value expected to avoid division by zero.')
 	})
 
 	test("buy with non tradeable token should fail", async () => {
@@ -37,19 +37,12 @@ contract('Scarcity', accounts => {
 	
 	})
 
-	test("trade should increase scarcity price of input token and decrease scarcity price of output token", async () => {
-	
-	})
 
 	test("repeated back and forth trade should increase scarcity price of both tokens", async () => {
 	
 	})
 
 	test("repeated back and forth trade should decrease slippage per trade", async () => {
-	
-	})
-
-	test("Trading mockToken1 should decrease total supply", async () => {
 	
 	})
 
@@ -63,5 +56,17 @@ contract('Scarcity', accounts => {
 
 	test("sell with too much slippage should fail", async () => {
 	
+	})
+
+	test("buy should exact a fee from Kharon and a reward in pyrotokens", async () => {
+	
+	})
+
+	test ("sell should burn scarcity", async()=>{
+
+	})
+
+	test ("setting slippage to zero should ignore all slippage", async()=>{
+
 	})
 })

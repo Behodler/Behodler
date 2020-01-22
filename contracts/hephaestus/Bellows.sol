@@ -13,12 +13,18 @@ import "../contractFacades/ERC20Like.sol";
 contract Bellows is Secondary {
 	using SafeMath for uint;
 	Validator validator;
-	function setValidator(address v) external onlyPrimary {
-		validator = Validator(v);
+
+	function seed(address validatorAddress) external onlyPrimary {
+		validator = Validator(validatorAddress);
+	}
+
+	function open(address baseToken,uint value) external {
+		require(validator.tokens(baseToken),"Token doesn't exist.");
+		require(ERC20Like(baseToken).transferFrom(msg.sender,address(this),value),"Transfer from holder failed");
 	}
 
 	function blast(address pyroToken, uint value) external {
-		require(validator.tokens(pyroToken),"token not a valid pyrotoken");
+		require(validator.tokens(PyroTokenLike(pyroToken).baseToken()),"PyroToken doesn't exist.");
 		require(ERC20Like(pyroToken).transferFrom(msg.sender,address(this),value),"Transfer from holder failed");
 		require(PyroTokenLike(pyroToken).burn(value),"could not burn pyrotoken");
 		require(PyroTokenLike(pyroToken).bellows() == address(this),"pyroToken reserve mismatch");

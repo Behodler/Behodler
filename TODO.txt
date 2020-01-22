@@ -1,11 +1,12 @@
-For next time: implement Chronos stamping in Behodler
+For next time: all the tests
 
-Next:
-Behodler must approve kharon. --DONE
-Kharon must approve Prometheus --DONE
-Kharon must have a donation address -- DONE
 Check behodler maths
+
 
 MATHS
 P=1/(2^64)Q allows me to buy fractional units (continuous) 1 wei buys 1 eth worth which means when Quantity is eth 
 then 1 eth will buy 1 eth with decimal places.
+
+
+Fee exemption:
+Right now Kharon is simple but in the future, it can be swapped out for something that allows for fee exemption
