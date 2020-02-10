@@ -1,0 +1,37 @@
+Bellows
+    open invalid token
+    open valid token increases redeem rate
+    blast invalid pyrotoken
+    blast pyrotoken for another bellows fails
+
+Validator
+    set valid sets tokens(address) to true
+
+
+Pyrotoken
+    add invalid token to registry
+    add valid token creates a pyrotoken that exists in baseTokenMapping. Invoking that token's baseToken gives the original base token
+    engulf mints at the current redeem rate.
+    engulf after bellows open mints at new redeem rate
+    burn increases redeem rate at bellows
+    burn for funny split rate at pre donates the split of pre to kharon which can be withdrawn
+
+Kharon 
+make a mock behodler that has a method for calling demandPayment. Seed kharon with this. The mock should have a tokenScarcityObligations method for tokenScarcityObligations
+    demandToll on scarcity returns 0 and does nothing
+    setting scarcityBurnCutoff to be less than token scarcityObligations returns 0 and does nothing
+    calling toll for other cases returns 2.4%
+    mock prometheus returns set number: if dai, weidai is donated according to split rate
+                                        if scarcity, entire fee is burnt, no donations
+                                        if token for which pyrotoken exists, bellows reserve increases by fee, donation increases
+                                        if token not legit, revert
+    
+Prometheus
+seed kharon as sender
+    if token is scarcity, weidai or dai, return 0
+    for token that has a pyrotoken, take half token value, wrap in pyrotoken and send to buyer
+
+Behodler
+
+
+

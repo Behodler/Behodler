@@ -8,17 +8,18 @@ contract PyroTokenRegistry is Secondary{
 	address public PatienceRegulationEngine;
 	mapping (address=>address) public baseTokenMapping;
 	address public bellows;
+	address public kharon;
 	Validator validator;
 
-	function seed(address b, address v) external onlyPrimary {
+	function seed(address b, address v, address k) external onlyPrimary {
 		bellows = b;
 		validator = Validator(v);
+		kharon = k;
 	}
 
 	function addToken(string calldata name, string calldata symbol, address baseToken) external onlyPrimary {
 		require(validator.tokens(baseToken),"invalid token");
-		PyroToken t = new PyroToken();
-		t.seed(name, symbol, baseToken, bellows, address(this));
+		PyroToken t = new PyroToken(name, symbol, baseToken, bellows, kharon, address(this));
 		baseTokenMapping[baseToken] = address(t);
 		require(address(t) != address(0),"deploy contract failed");
 	}

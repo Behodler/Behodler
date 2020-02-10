@@ -5,10 +5,10 @@ import "./Validator.sol";
 import "../contractFacades/PyroTokenLike.sol";
 import "../contractFacades/ERC20Like.sol";
 /*
-	A bellow is the reserve of a Pyrotoken. It contains the base token. 
+	A bellow is the reserve of a Pyrotoken. It contains the base token.
 	When a bellow is added to, it is 'opened'. When a pyrotoken is redeemed, the bellow 'blasts'.
 	The Bellows contract uses a mapping to hold reserves for all pyrotokens.
-	The Bellows maintain the redeem rate.
+	The Bellows maintain the redeem rate for each token .
  */
 contract Bellows is Secondary {
 	using SafeMath for uint;

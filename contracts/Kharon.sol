@@ -10,6 +10,7 @@ import "./hephaestus/PyroTokenRegistry.sol";
 import "../node_modules/openzeppelin-solidity/contracts/ownership/Secondary.sol";
 import "./contractFacades/ERC20Like.sol";
 import "../node_modules/openzeppelin-solidity/contracts/math/SafeMath.sol";
+import "./Scarcity.sol";
 /*
 	Kharon exacts fees from input tokens in a behodler trade. If the input token is a pyrotoken, the fee is used to increase the reserve.
 	If the token is dai, it is used to instantly buy and burn WeiDai. If the token is WeiDai or Scarcity, it is burnt. Burning scarcity helps to gradually
@@ -28,7 +29,7 @@ contract Kharon is Secondary{
 	PyroTokenRegistry public tokenRegistry;
 	address WeiDaiBank;
 	address Dai;
-	address Scarcity;
+	address scarcityAddress;
 	address donationAddress;
 	uint scarcityBurnCuttoff;
 
@@ -40,14 +41,14 @@ contract Kharon is Secondary{
 		PatienceRegulationEngine = PatienceRegulationEngineLike(pr);
 		WeiDaiBank = ban;
 		Dai = dai;
-		Scarcity = scar;
+		scarcityAddress = scar;
 		scarcityBurnCuttoff = cut;
 		donationAddress = d;
 	}
 
 	function toll(address token, uint value) public view returns (uint){//percentage expressed as number between 0 and 1000
 		//if the token isn't scarcity, we burn 2.4%. If it is scarcity, we first check if we should burn anymore
-		if(token != Scarcity || behodler.tokenScarcityObligations(token) <= scarcityBurnCuttoff){
+		if(token != scarcityAddress || behodler.tokenScarcityObligations(token) <= scarcityBurnCuttoff){
 			return uint(24).mul(value).div(1000);
 		}
 		return 0;
@@ -61,18 +62,22 @@ contract Kharon is Secondary{
 		require(ERC20Like(token).transferFrom(msg.sender,address(this), tollValue),"toll taking failed");
 		ERC20Like(token).approve(address(prometheus),uint(-1));
 		uint reward = prometheus.stealFlame(token,tollValue, buyer);
-		uint amountToBurn = tollValue.sub(reward);
+		uint netToll = tollValue.sub(reward);
 		//get split rate and calculate portion to burn. Remaining is a donation
-		uint netSplitRate = uint(100).sub(PatienceRegulationEngine.getDonationSplit(buyer));
-		amountToBurn = amountToBurn.mul(100).div(netSplitRate);
+		uint donationSplit = PatienceRegulationEngine.getDonationSplit(buyer);
+		uint netSplitRate = uint(100).sub(donationSplit);
+		uint amountToBurn = netToll.mul(100).div(netSplitRate);
 
 		if(token == Dai){
-			PatienceRegulationEngine.buyWeiDai(amountToBurn,PatienceRegulationEngine.getDonationSplit(buyer));
+			PatienceRegulationEngine.buyWeiDai(netToll,donationSplit);
 			PatienceRegulationEngine.claimWeiDai();
-		}else if(token == Scarcity) {
-			PyroTokenLike(token).burn(amountToBurn); //burns either pyrotokens or scarcity
+		}else if(token == scarcityAddress) {
+			Scarcity(token).burn(netToll);
 		} else if(tokenRegistry.baseTokenMapping(token) != address(0)){
 			bellows.open(token,amountToBurn);
+		}
+		else {
+			revert("invalid token trade.");
 		}
 		return tollValue;
 	}

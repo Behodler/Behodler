@@ -17,14 +17,16 @@ contract PyroToken is Secondary, ERC20{
 	string public symbol;
 	ERC20 public baseToken;
 	Bellows public bellows;
+	address public kharon;
 	PyroTokenRegistry public registry;
 
-	function seed(string calldata n, string calldata s, address base, address bellow, address r) external onlyPrimary{
+	constructor (string memory n, string memory s, address base, address bellow,address k, address r) public{
 		name = n;
 		symbol = s;
 		baseToken = ERC20(base);
 		bellows = Bellows(bellow);
 		registry = PyroTokenRegistry(r);
+		kharon = k;
 	}
 
 	function decimals() external pure returns (uint8) {
@@ -44,7 +46,7 @@ contract PyroToken is Secondary, ERC20{
 		uint donation = splitRate.mul(value).div(100);
 		uint valueToBurn = value;
 		if(donation > 0) {
-			_transfer(msg.sender, address(bellows), donation);
+			_transfer(msg.sender, kharon, donation);
 		}
 		valueToBurn = value.sub(valueToBurn);
 	}
