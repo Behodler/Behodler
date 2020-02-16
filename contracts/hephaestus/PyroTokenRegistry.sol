@@ -7,6 +7,7 @@ import "./Validator.sol";
 contract PyroTokenRegistry is Secondary{
 	address public PatienceRegulationEngine;
 	mapping (address=>address) public baseTokenMapping;
+	mapping (address=>address) public pyroTokenMapping;
 	address public bellows;
 	address public kharon;
 	Validator validator;
@@ -20,7 +21,9 @@ contract PyroTokenRegistry is Secondary{
 	function addToken(string calldata name, string calldata symbol, address baseToken) external onlyPrimary {
 		require(validator.tokens(baseToken),"invalid token");
 		PyroToken t = new PyroToken(name, symbol, baseToken, bellows, kharon, address(this));
-		baseTokenMapping[baseToken] = address(t);
+		address pTokenAddress = address(t);
+		baseTokenMapping[baseToken] = pTokenAddress;
+		pyroTokenMapping[pTokenAddress] = baseToken;
 		require(address(t) != address(0),"deploy contract failed");
 	}
 }

@@ -2,6 +2,7 @@ pragma solidity ^0.6.1;
 import "../../node_modules/openzeppelin-solidity/contracts/ownership/Secondary.sol";
 import "../../node_modules/openzeppelin-solidity/contracts/math/SafeMath.sol";
 import "./Validator.sol";
+import "./PyroTokenRegistry.sol";
 import "../contractFacades/PyroTokenLike.sol";
 import "../contractFacades/ERC20Like.sol";
 /*
@@ -13,9 +14,11 @@ import "../contractFacades/ERC20Like.sol";
 contract Bellows is Secondary {
 	using SafeMath for uint;
 	Validator validator;
+	PyroTokenRegistry registry;
 
-	function seed(address validatorAddress) external onlyPrimary {
+	function seed(address validatorAddress, address pyroTokenRegistry) external onlyPrimary {
 		validator = Validator(validatorAddress);
+		registry = PyroTokenRegistry(pyroTokenRegistry);
 	}
 
 	function open(address baseToken,uint value) external {
@@ -24,6 +27,7 @@ contract Bellows is Secondary {
 	}
 
 	function blast(address pyroToken, uint value) external {
+		require(validator.tokens(registry.pyroTokenMapping(pyroToken)),"PyroToken doesn't exist.");
 		require(validator.tokens(PyroTokenLike(pyroToken).baseToken()),"PyroToken doesn't exist.");
 		require(ERC20Like(pyroToken).transferFrom(msg.sender,address(this),value),"Transfer from holder failed");
 		require(PyroTokenLike(pyroToken).burn(value),"could not burn pyrotoken");

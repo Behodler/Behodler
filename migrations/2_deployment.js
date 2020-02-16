@@ -3,6 +3,7 @@ const Validator = artifacts.require('Validator')
 const Behodler = artifacts.require('Behodler')
 const MockToken1 = artifacts.require('MockToken1')
 const MockToken2 = artifacts.require('MockToken2')
+const MockInvalidToken = artifacts.require('MockInvalidToken')
 const MockWeth = artifacts.require('MockWeth')
 const Kharon = artifacts.require('Kharon')
 const Prometheus = artifacts.require('Prometheus')
@@ -12,8 +13,8 @@ const Bellows = artifacts.require('Bellows')
 const Registry = artifacts.require('PyroTokenRegistry')
 
 module.exports = async function (deployer, network, accounts) {
-	var scarcityInstance, validatorInstance, behodlerInstance, mock1Instance, mock2Instance, mockWethInstance,
-		kharonInstance, prometheusInstance, janusInstance, chronosInstance, bellowsInstance, registryInstance
+	var scarcityInstance, validatorInstance, behodlerInstance, mock1Instance, mock2Instance, mockWethInstance, mockInvalidTokenInstance
+	var	kharonInstance, prometheusInstance, janusInstance, chronosInstance, bellowsInstance, registryInstance
 
 	await deployer.deploy(Scarcity)
 	await deployer.deploy(Validator)
@@ -39,8 +40,8 @@ module.exports = async function (deployer, network, accounts) {
 	await chronosInstance.seed(behodlerInstance.address)
 	await scarcityInstance.setBehodler(behodlerInstance.address)
 	await validatorInstance.setScarcity(scarcityInstance.address)
-	await registryInstance.seed(bellowsInstance.address, validatorInstance.address)
-	await bellowsInstance.seed(validatorInstance.address)
+	await registryInstance.seed(bellowsInstance.address, validatorInstance.address, kharonInstance.address)
+	await bellowsInstance.seed(validatorInstance.address, registryInstance.address)
 
 	let bankAddress = '', daiAddress = '', weiDaiAddress = '',preAddress, donationAddress = '', wethAddress = ''
 	if (network === 'development') {
@@ -58,11 +59,13 @@ module.exports = async function (deployer, network, accounts) {
 
 		await deployer.deploy(MockToken1)
 		await deployer.deploy(MockToken2)
+		await deployer.deploy(MockInvalidToken)
 		await deployer.deploy(MockWeth)
 
 		mock1Instance = await MockToken1.deployed()
 		mock2Instance = await MockToken2.deployed()
 		mockWethInstance = await MockWeth.deployed()
+		mockInvalidTokenInstance = await MockInvalidToken.deployed()
 		wethAddress = mockWethInstance.address
 
 		donationAddress = '0xD8d8632Bb8C8b199e43faDf7205749dd34C4B8c9'
@@ -84,6 +87,4 @@ module.exports = async function (deployer, network, accounts) {
 	await prometheusInstance.seed(kharonInstance.address, scarcityInstance.address, weiDaiAddress, daiAddress, registryInstance.address)
 	await kharonInstance.seed(bellowsInstance.address, behodlerInstance.address, prometheusInstance.address,preAddress, bankAddress, daiAddress, scarcityInstance.address, '10000000000000000000', donationAddress)
 	await janusInstance.seed(scarcityInstance.address, wethAddress, behodlerInstance.address)
-
-	
 }
