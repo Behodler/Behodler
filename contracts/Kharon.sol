@@ -25,7 +25,7 @@ contract Kharon is Secondary{
 	Bellows public bellows;
 	Behodler public behodler;
 	Prometheus public prometheus;
-	PatienceRegulationEngineLike PatienceRegulationEngine;
+	PatienceRegulationEngineLike public PatienceRegulationEngine;
 	PyroTokenRegistry public tokenRegistry;
 	address WeiDaiBank;
 	address Dai;

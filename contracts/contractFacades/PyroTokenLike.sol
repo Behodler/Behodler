@@ -8,5 +8,5 @@ abstract contract PyroTokenLike {
 	function bellows() external virtual view returns (address);
 	function baseToken() external virtual view returns (address);
 	function engulf (address sender, uint value) external virtual returns (bool);
-	function burn (uint value) external virtual returns (bool);
+	function burn (uint value) external virtual returns (uint);
 }
