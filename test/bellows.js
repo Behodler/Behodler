@@ -5,18 +5,15 @@ const pyroTokenABI = require('./PyroToken.json').abi
 
 const test = async.test
 const setup = async.setup
-const scarcity = artifacts.require("Scarcity")
 const mockToken1 = artifacts.require('MockToken1')
 const mockToken2 = artifacts.require('MockToken2')
 const mockInvalidToken = artifacts.require('MockInvalidToken')
 const bellows = artifacts.require('Bellows')
 const registry = artifacts.require("PyroTokenRegistry")
 
-let primary = ""
 contract('Bellows', accounts => {
 	var  mock1Instance, bellowsInstance, registryInstance, mockInvalidTokenInstance
 	setup(async () => {
-		scarcityInstance = await scarcity.deployed()
 		mock1Instance = await mockToken1.deployed()
 		mock2Instance = await mockToken2.deployed()
 		mockInvalidTokenInstance = await mockInvalidToken.deployed()

@@ -1,12 +1,3 @@
-Bellows
-    open invalid token
-    open valid token increases redeem rate
-    blast invalid pyrotoken
-    blast pyrotoken for another bellows fails
-
-Validator
-    set valid sets tokens(address) to true
-
 
 Pyrotoken
     add invalid token to registry
