@@ -11,10 +11,11 @@ const Janus = artifacts.require('Janus')
 const Chronos = artifacts.require('Chronos')
 const Bellows = artifacts.require('Bellows')
 const Registry = artifacts.require('PyroTokenRegistry')
+const MockBehodler = artifacts.require("MockBehodler")
 
 module.exports = async function (deployer, network, accounts) {
 	var scarcityInstance, lachesisInstance, behodlerInstance, mock1Instance, mock2Instance, mockWethInstance, mockInvalidTokenInstance
-	var	kharonInstance, prometheusInstance, janusInstance, chronosInstance, bellowsInstance, registryInstance
+	var kharonInstance, prometheusInstance, janusInstance, chronosInstance, bellowsInstance, registryInstance, mockBehodlerInstance
 
 	await deployer.deploy(Scarcity)
 	await deployer.deploy(Lachesis)
@@ -43,7 +44,7 @@ module.exports = async function (deployer, network, accounts) {
 	await registryInstance.seed(bellowsInstance.address, lachesisInstance.address, kharonInstance.address)
 	await bellowsInstance.seed(lachesisInstance.address, registryInstance.address)
 
-	let bankAddress = '', daiAddress = '', weiDaiAddress = '',preAddress, donationAddress = '', wethAddress = ''
+	let bankAddress = '', daiAddress = '', weiDaiAddress = '', preAddress, donationAddress = '', wethAddress = ''
 	if (network === 'development') {
 		let contracts =
 		{
@@ -61,21 +62,25 @@ module.exports = async function (deployer, network, accounts) {
 		await deployer.deploy(MockToken2)
 		await deployer.deploy(MockInvalidToken)
 		await deployer.deploy(MockWeth)
+		await deployer.deploy(MockBehodler)
 
 		mock1Instance = await MockToken1.deployed()
 		mock2Instance = await MockToken2.deployed()
 		mockWethInstance = await MockWeth.deployed()
 		mockInvalidTokenInstance = await MockInvalidToken.deployed()
+		mockBehodlerInstance = await MockBehodler.deployed()
 		wethAddress = mockWethInstance.address
 
 		donationAddress = '0xD8d8632Bb8C8b199e43faDf7205749dd34C4B8c9'
+
+		await mockBehodlerInstance.seed(kharonInstance.address)
 
 		await lachesisInstance.measure(mock1Instance.address, true)
 		await lachesisInstance.measure(mock2Instance.address, true)
 		await lachesisInstance.measure(mockWethInstance.address, true)
 
-		await registryInstance.addToken("pyroMock1","PMC1",mock1Instance.address)
-		await registryInstance.addToken("pyroMock2","PMC2",mock2Instance.address)
+		await registryInstance.addToken("pyroMock1", "PMC1", mock1Instance.address)
+		await registryInstance.addToken("pyroMock2", "PMC2", mock2Instance.address)
 
 	}
 	else if (network === 'main' || network == 'main-fork') {
@@ -85,6 +90,6 @@ module.exports = async function (deployer, network, accounts) {
 
 	}
 	await prometheusInstance.seed(kharonInstance.address, scarcityInstance.address, weiDaiAddress, daiAddress, registryInstance.address)
-	await kharonInstance.seed(bellowsInstance.address, behodlerInstance.address, prometheusInstance.address,preAddress, bankAddress, daiAddress, scarcityInstance.address, '10000000000000000000', donationAddress)
+	await kharonInstance.seed(bellowsInstance.address, behodlerInstance.address, prometheusInstance.address, preAddress, bankAddress, daiAddress, scarcityInstance.address, '10000000000000000000', donationAddress)
 	await janusInstance.seed(scarcityInstance.address, wethAddress, behodlerInstance.address)
 }

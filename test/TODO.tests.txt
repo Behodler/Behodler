@@ -1,6 +1,6 @@
 Kharon 
 make a mock behodler that has a method for calling demandPayment. Seed kharon with this. The mock should have a tokenScarcityObligations method for tokenScarcityObligations
-    demandToll on scarcity returns 0 and does nothing
+    demandToll on scarcity returns 0 and does nothing --BUSY
     setting scarcityBurnCutoff to be less than token scarcityObligations returns 0 and does nothing
     calling toll for other cases returns 2.4%
     mock prometheus returns set number: if dai, weidai is donated according to split rate

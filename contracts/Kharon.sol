@@ -27,9 +27,9 @@ contract Kharon is Secondary{
 	Prometheus public prometheus;
 	PatienceRegulationEngineLike public PatienceRegulationEngine;
 	PyroTokenRegistry public tokenRegistry;
-	address WeiDaiBank;
-	address Dai;
-	address scarcityAddress;
+	address public WeiDaiBank;
+	address public Dai;
+	address public scarcityAddress;
 	address donationAddress;
 	uint scarcityBurnCuttoff;
 
