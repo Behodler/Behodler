@@ -2,6 +2,7 @@
 const async = require('./helpers/async.js')
 const expectThrow = require('./helpers/expectThrow').handle
 const pyroTokenABI = require('./PyroToken.json').abi
+const patienceRegulationEngineABI = require('./PatienceRegulationEngine.json').abi
 
 const test = async.test
 const setup = async.setup
@@ -53,6 +54,8 @@ contract('PyroToken', accounts => {
         await registryInstance.addToken("valid", "val", mock1Instance.address);
         const pyroTokenAddress = await registryInstance.baseTokenMapping(mock1Instance.address);
         const pyroTokenInstance = (await new web3.eth.Contract(pyroTokenABI, pyroTokenAddress))
+        const preInstance = (await new web3.eth.Contract(patienceRegulationEngineABI, "0x4Cfde611c84E2318C01092Ade351479b71164203"))
+        await preInstance.methods.setDonationSplit(20).send(options)
         const pAddress = pyroTokenInstance.options.address
         await mock1Instance.approve(pyroTokenAddress, "1000")
         await pyroTokenInstance.methods.engulf(accounts[0], "100").send(options)
@@ -62,9 +65,9 @@ contract('PyroToken', accounts => {
         const balance = await pyroTokenInstance.methods.balanceOf(accounts[0]).call(options)
         assert.equal(balance, "5000")
         const redeemRateAfter = (await bellowsInstance.getRedeemRate(pAddress)).toString()
-        assert.equal(redeemRateAfter, "181")
+        assert.equal(redeemRateAfter, "166")
 
         const kharonBalance = (await pyroTokenInstance.methods.balanceOf(kharonInstance.address).call()).toString()
-        assert.equal(kharonBalance, "500")
+        assert.equal(kharonBalance, "1000")
     })
 })

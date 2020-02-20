@@ -3,7 +3,7 @@ Pyrotoken
     add invalid token to registry --DONE
     add valid token creates a pyrotoken that exists in baseTokenMapping. Invoking that token's baseToken gives the original base token --DONE
     burn increases redeem rate at bellows --DONE
-    burn for funny split rate at pre donates the split of pre to kharon which can be withdrawn --BUSY
+    burn for funny split rate at pre donates the split of pre to kharon which can be withdrawn --DONE
 
 Kharon 
 make a mock behodler that has a method for calling demandPayment. Seed kharon with this. The mock should have a tokenScarcityObligations method for tokenScarcityObligations
