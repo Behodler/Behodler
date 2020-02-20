@@ -1,11 +1,9 @@
 
 Pyrotoken
-    add invalid token to registry
-    add valid token creates a pyrotoken that exists in baseTokenMapping. Invoking that token's baseToken gives the original base token
-    engulf mints at the current redeem rate.
-    engulf after bellows open mints at new redeem rate
-    burn increases redeem rate at bellows
-    burn for funny split rate at pre donates the split of pre to kharon which can be withdrawn
+    add invalid token to registry --DONE
+    add valid token creates a pyrotoken that exists in baseTokenMapping. Invoking that token's baseToken gives the original base token --DONE
+    burn increases redeem rate at bellows --DONE
+    burn for funny split rate at pre donates the split of pre to kharon which can be withdrawn --BUSY
 
 Kharon 
 make a mock behodler that has a method for calling demandPayment. Seed kharon with this. The mock should have a tokenScarcityObligations method for tokenScarcityObligations
