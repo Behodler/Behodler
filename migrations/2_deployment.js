@@ -1,5 +1,5 @@
 const Scarcity = artifacts.require('Scarcity')
-const Validator = artifacts.require('Validator')
+const Lachesis = artifacts.require('Lachesis')
 const Behodler = artifacts.require('Behodler')
 const MockToken1 = artifacts.require('MockToken1')
 const MockToken2 = artifacts.require('MockToken2')
@@ -13,11 +13,11 @@ const Bellows = artifacts.require('Bellows')
 const Registry = artifacts.require('PyroTokenRegistry')
 
 module.exports = async function (deployer, network, accounts) {
-	var scarcityInstance, validatorInstance, behodlerInstance, mock1Instance, mock2Instance, mockWethInstance, mockInvalidTokenInstance
+	var scarcityInstance, lachesisInstance, behodlerInstance, mock1Instance, mock2Instance, mockWethInstance, mockInvalidTokenInstance
 	var	kharonInstance, prometheusInstance, janusInstance, chronosInstance, bellowsInstance, registryInstance
 
 	await deployer.deploy(Scarcity)
-	await deployer.deploy(Validator)
+	await deployer.deploy(Lachesis)
 	await deployer.deploy(Behodler)
 	await deployer.deploy(Kharon)
 	await deployer.deploy(Prometheus)
@@ -27,7 +27,7 @@ module.exports = async function (deployer, network, accounts) {
 	await deployer.deploy(Registry)
 
 	scarcityInstance = await Scarcity.deployed()
-	validatorInstance = await Validator.deployed()
+	lachesisInstance = await Lachesis.deployed()
 	behodlerInstance = await Behodler.deployed()
 	kharonInstance = await Kharon.deployed()
 	prometheusInstance = await Prometheus.deployed()
@@ -36,12 +36,12 @@ module.exports = async function (deployer, network, accounts) {
 	bellowsInstance = await Bellows.deployed()
 	registryInstance = await Registry.deployed()
 
-	await behodlerInstance.seed(validatorInstance.address, kharonInstance.address, janusInstance.address, chronosInstance.address)
+	await behodlerInstance.seed(lachesisInstance.address, kharonInstance.address, janusInstance.address, chronosInstance.address)
 	await chronosInstance.seed(behodlerInstance.address)
 	await scarcityInstance.setBehodler(behodlerInstance.address)
-	await validatorInstance.setScarcity(scarcityInstance.address)
-	await registryInstance.seed(bellowsInstance.address, validatorInstance.address, kharonInstance.address)
-	await bellowsInstance.seed(validatorInstance.address, registryInstance.address)
+	await lachesisInstance.setScarcity(scarcityInstance.address)
+	await registryInstance.seed(bellowsInstance.address, lachesisInstance.address, kharonInstance.address)
+	await bellowsInstance.seed(lachesisInstance.address, registryInstance.address)
 
 	let bankAddress = '', daiAddress = '', weiDaiAddress = '',preAddress, donationAddress = '', wethAddress = ''
 	if (network === 'development') {
@@ -70,9 +70,9 @@ module.exports = async function (deployer, network, accounts) {
 
 		donationAddress = '0xD8d8632Bb8C8b199e43faDf7205749dd34C4B8c9'
 
-		await validatorInstance.setValid(mock1Instance.address, true)
-		await validatorInstance.setValid(mock2Instance.address, true)
-		await validatorInstance.setValid(mockWethInstance.address, true)
+		await lachesisInstance.measure(mock1Instance.address, true)
+		await lachesisInstance.measure(mock2Instance.address, true)
+		await lachesisInstance.measure(mockWethInstance.address, true)
 
 		await registryInstance.addToken("pyroMock1","PMC1",mock1Instance.address)
 		await registryInstance.addToken("pyroMock2","PMC2",mock2Instance.address)

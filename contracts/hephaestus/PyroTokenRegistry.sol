@@ -2,23 +2,23 @@ pragma solidity ^0.6.1;
 
 import "../../node_modules/openzeppelin-solidity/contracts/ownership/Secondary.sol";
 import "./PyroToken.sol";
-import "./Validator.sol";
+import "./Lachesis.sol";
 
 contract PyroTokenRegistry is Secondary{
 	mapping (address=>address) public baseTokenMapping;
 	mapping (address=>address) public pyroTokenMapping;
 	address public bellows;
 	address public kharon;
-	Validator validator;
+	Lachesis lachesis;
 
-	function seed(address b, address v, address k) external onlyPrimary {
+	function seed(address b, address l, address k) external onlyPrimary {
 		bellows = b;
-		validator = Validator(v);
+		lachesis = Lachesis(l);
 		kharon = k;
 	}
 
 	function addToken(string calldata name, string calldata symbol, address baseToken) external onlyPrimary {
-		require(validator.tokens(baseToken),"invalid token");
+		lachesis.cut(baseToken);
 		PyroToken t = new PyroToken(name, symbol, bellows, kharon, address(this));
 		address pTokenAddress = address(t);
 		baseTokenMapping[baseToken] = pTokenAddress;

@@ -23,7 +23,7 @@ contract('Bellows', accounts => {
 	})
 
 	test("open for non registered token fails", async () => {
-		await expectThrow(bellowsInstance.open(mockInvalidTokenInstance.address, '200'), "Token doesn't exist.")
+		await expectThrow(bellowsInstance.open(mockInvalidTokenInstance.address, '200'), "invalid token.")
 	})
 
 	test("open when pyro supply zero fails", async () => {
@@ -69,6 +69,6 @@ contract('Bellows', accounts => {
 	})
 
 	test("blast of non pyrotoken fails", async () => {
-		await expectThrow(bellowsInstance.blast(mockInvalidTokenInstance.address, "100"), "PyroToken doesn't exist.")
+		await expectThrow(bellowsInstance.blast(mockInvalidTokenInstance.address, "100"), "invalid token.")
 	})
 })

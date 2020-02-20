@@ -1,7 +1,7 @@
 pragma solidity ^0.6.1;
 import "../../node_modules/openzeppelin-solidity/contracts/ownership/Secondary.sol";
 import "../../node_modules/openzeppelin-solidity/contracts/math/SafeMath.sol";
-import "./Validator.sol";
+import "./Lachesis.sol";
 import "./PyroTokenRegistry.sol";
 import "../contractFacades/PyroTokenLike.sol";
 import "../contractFacades/ERC20Like.sol";
@@ -13,22 +13,22 @@ import "../contractFacades/ERC20Like.sol";
  */
 contract Bellows is Secondary {
 	using SafeMath for uint;
-	Validator validator;
+	Lachesis lachesis;
 	PyroTokenRegistry registry;
 
-	function seed(address validatorAddress, address pyroTokenRegistry) external onlyPrimary {
-		validator = Validator(validatorAddress);
+	function seed(address lachesisAddress, address pyroTokenRegistry) external onlyPrimary {
+		lachesis = Lachesis(lachesisAddress);
 		registry = PyroTokenRegistry(pyroTokenRegistry);
 	}
 
 	function open(address baseToken,uint value) external {
-		require(validator.tokens(baseToken),"Token doesn't exist.");
+		lachesis.cut(baseToken);
 		require (ERC20Like(registry.baseTokenMapping(baseToken)).totalSupply()>0,"bellow cannot be opened before pyrotokens minted");
 		require(ERC20Like(baseToken).transferFrom(msg.sender,address(this),value),"Transfer from holder failed");
 	}
 
 	function blast(address pyroToken, uint value) external {
-		require(validator.tokens(registry.pyroTokenMapping(pyroToken)),"PyroToken doesn't exist.");
+		lachesis.cut(registry.pyroTokenMapping(pyroToken));
 		require(ERC20Like(pyroToken).transferFrom(msg.sender,address(this),value),"Transfer from holder failed");
 		uint redeemRate = getRedeemRate(pyroToken);
 		uint valueBurnt = PyroTokenLike(pyroToken).burn(value);

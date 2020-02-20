@@ -2,7 +2,7 @@ pragma solidity ^0.6.1;
 import "../node_modules/openzeppelin-solidity/contracts/ownership/Secondary.sol";
 import "../node_modules/openzeppelin-solidity/contracts/ownership/Secondary.sol";
 import "../node_modules/openzeppelin-solidity/contracts/math/SafeMath.sol";
-import "./hephaestus/Validator.sol";
+import "./hephaestus/Lachesis.sol";
 import "./Kharon.sol";
 import "./contractFacades/ERC20Like.sol";
 import "./libraries/SafeOperations.sol";
@@ -19,15 +19,15 @@ contract Behodler is Secondary
 	using SafeMath for uint;
 	using SafeOperations for uint;
 	uint constant factor = 128;
-	Validator validator;
+	Lachesis lachesis;
 	Kharon kharon;
 	Chronos chronos;
 	address janus;
 	mapping (address=>uint) public tokenScarcityObligations; //marginal scarcity price of token
 
-	function seed(address validatorAddress, address kharonAddress, address janusAddress, address chronosAddress) external onlyPrimary {
+	function seed(address lachesisAddress, address kharonAddress, address janusAddress, address chronosAddress) external onlyPrimary {
 		kharon = Kharon(kharonAddress);
-		validator = Validator(validatorAddress);
+		lachesis = Lachesis(lachesisAddress);
 		janus = janusAddress;
 		chronos = Chronos(chronosAddress);
 	}
@@ -45,7 +45,7 @@ contract Behodler is Secondary
 	}
 
 	function getScarcityAddress() private view returns (address){
-		return validator.scarcity.address;
+		return lachesis.scarcity.address;
 	}
 
 	function buyScarcity(address sender, address tokenAddress, uint value, uint minPrice) external returns (uint){
@@ -67,7 +67,7 @@ contract Behodler is Secondary
 	}
 
 	function buy (address tokenAddress, uint value, address purchaser, uint minPrice) private returns (uint){
-		require(validator.tokens(tokenAddress), "token not tradeable.");
+		lachesis.cut(tokenAddress);
 		ERC20Like(tokenAddress).transferFrom(purchaser, address(this),value);
 		ERC20Like(tokenAddress).approve(address(kharon),uint(-1));
 		uint amountToPurchaseWith = value.sub(kharon.demandPayment(tokenAddress,value,purchaser));
@@ -90,7 +90,7 @@ contract Behodler is Secondary
 	}
 
 	function sell (address tokenAddress, uint scarcityValue, address seller, uint maxPrice) private returns (uint){
-		require(validator.tokens(tokenAddress), "token not tradeable.");
+		lachesis.cut(tokenAddress);
 		address scarcityAddress = getScarcityAddress();
 		Scarcity(scarcityAddress).transferToBehodler(seller, scarcityValue);
 
