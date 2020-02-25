@@ -11,6 +11,7 @@ import "../node_modules/openzeppelin-solidity/contracts/ownership/Secondary.sol"
 import "./contractFacades/ERC20Like.sol";
 import "../node_modules/openzeppelin-solidity/contracts/math/SafeMath.sol";
 import "./Scarcity.sol";
+import "./contractFacades/WeiDaiLike.sol";
 /*
 	Kharon exacts fees from input tokens in a behodler trade. If the input token is a pyrotoken, the fee is used to increase the reserve.
 	If the token is dai, it is used to instantly buy and burn WeiDai. If the token is WeiDai or Scarcity, it is burnt. Burning scarcity helps to gradually
@@ -30,10 +31,11 @@ contract Kharon is Secondary{
 	address public WeiDaiBank;
 	address public Dai;
 	address public scarcityAddress;
+	address weidaiAddress;
 	address donationAddress;
 	uint scarcityBurnCuttoff;
 
-	function seed (address bl, address bh, address pm, address pr, address ban,address dai, address scar, uint cut, address d) external onlyPrimary {
+	function seed (address bl, address bh, address pm, address pr, address ban,address dai, address weidai, address scar, uint cut, address d) external onlyPrimary {
 		bellows = Bellows(bl);
 		behodler = Behodler(bh);
 		prometheus = Prometheus(pm);
@@ -44,6 +46,7 @@ contract Kharon is Secondary{
 		scarcityAddress = scar;
 		scarcityBurnCuttoff = cut;
 		donationAddress = d;
+		weidaiAddress = weidai;
 	}
 
 	function toll(address token, uint value) public view returns (uint){//percentage expressed as number between 0 and 1000
@@ -59,6 +62,7 @@ contract Kharon is Secondary{
 		uint tollValue = toll(token,value);
 		if(tollValue == 0)
 			return 0;
+
 		require(ERC20Like(token).transferFrom(msg.sender,address(this), tollValue),"toll taking failed");
 		ERC20Like(token).approve(address(prometheus),uint(-1));
 		uint reward = prometheus.stealFlame(token,tollValue, buyer);
@@ -69,11 +73,15 @@ contract Kharon is Secondary{
 		uint amountToBurn = netToll.mul(100).div(netSplitRate);
 
 		if(token == Dai){
+			ERC20Like(token).approve(WeiDaiBank,uint(-1));
 			PatienceRegulationEngine.buyWeiDai(netToll,donationSplit);
 			PatienceRegulationEngine.claimWeiDai();
 		}else if(token == scarcityAddress) {
 			Scarcity(token).burn(netToll);
-		} else if(tokenRegistry.baseTokenMapping(token) != address(0)){
+		}else if(token == weidaiAddress){
+			WeiDaiLike(token).burn(address(this), netToll);
+		}
+		 else if(tokenRegistry.baseTokenMapping(token) != address(0)){
 			bellows.open(token,amountToBurn);
 		}
 		else {

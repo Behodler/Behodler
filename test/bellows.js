@@ -1,7 +1,7 @@
 
 const async = require('./helpers/async.js')
 const expectThrow = require('./helpers/expectThrow').handle
-const pyroTokenABI = require('./PyroToken.json').abi
+const pyroTokenABI = require('./ABI/PyroToken.json').abi
 
 const test = async.test
 const setup = async.setup
