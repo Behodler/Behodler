@@ -12,6 +12,8 @@ const Chronos = artifacts.require('Chronos')
 const Bellows = artifacts.require('Bellows')
 const Registry = artifacts.require('PyroTokenRegistry')
 const MockBehodler = artifacts.require("MockBehodler")
+const messageObjectFileLocation = '../messageLocation.json'
+const fs = require('fs')
 
 module.exports = async function (deployer, network, accounts) {
 	var scarcityInstance, lachesisInstance, behodlerInstance, mock1Instance, mock2Instance, mockWethInstance, mockInvalidTokenInstance
@@ -46,13 +48,10 @@ module.exports = async function (deployer, network, accounts) {
 
 	let bankAddress = '', daiAddress = '', weiDaiAddress = '', preAddress, donationAddress = '', wethAddress = ''
 	if (network === 'development') {
-		let contracts =
-		{
-			"dai": "0xB9f5A0Ad0B8F3b3C704C9b071f753F73Cc8843bE",
-			"weiDai": "0x8a16E29CaC5e50c9aa2a497589a02004e83e10e2",
-			"bank": "0x156E7b05073A8AD3C867b1362bb917696dCCA3f2",
-			"pre": "0x4Cfde611c84E2318C01092Ade351479b71164203"
-		}
+
+		let contracts = JSON.parse(fs.readFileSync(messageObjectFileLocation))
+		console.log("Incoming Contracts")
+		console.log(JSON.stringify(contracts, null, 4))
 		daiAddress = contracts.dai;
 		weiDaiAddress = contracts.weiDai;
 		bankAddress = contracts.bank
@@ -90,6 +89,6 @@ module.exports = async function (deployer, network, accounts) {
 
 	}
 	await prometheusInstance.seed(kharonInstance.address, scarcityInstance.address, weiDaiAddress, daiAddress, registryInstance.address)
-	await kharonInstance.seed(bellowsInstance.address, behodlerInstance.address, prometheusInstance.address, preAddress, bankAddress, daiAddress,weiDaiAddress, scarcityInstance.address, '10000000000000000000', donationAddress)
+	await kharonInstance.seed(bellowsInstance.address, behodlerInstance.address, prometheusInstance.address, preAddress, bankAddress, daiAddress, weiDaiAddress, scarcityInstance.address, '10000000000000000000', donationAddress)
 	await janusInstance.seed(scarcityInstance.address, wethAddress, behodlerInstance.address)
 }
