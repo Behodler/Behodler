@@ -26,7 +26,7 @@ let mock1Instance, bellowsInstance, registryInstance, lachesisInstance, kharonIn
 let scarcityAddress, scarcityInstance, mockDaiInstance, primary, donationAccount, daiAddress, weidaiBankAddress, weiDaiAddress
 let weidaiBankInstance, weidaiInstance, preAddress
 
-let testSetup = async (accounts) => {
+let testSetup = async (accounts, cutoff) => {
     mock1Instance = await mockToken1.deployed()
     mock2Instance = await mockToken2.deployed()
     mockInvalidTokenInstance = await mockInvalidToken.deployed()
@@ -43,7 +43,6 @@ let testSetup = async (accounts) => {
     const bankAddress = (await kharonInstance.WeiDaiBank()).toString()
     daiAddress = (await kharonInstance.Dai()).toString()
     scarcityAddress = (await kharonInstance.scarcityAddress()).toString()
-    const cutoff = 1000
     const donationAddress = accounts[3]
     weiDaiAddress = "0x8a16E29CaC5e50c9aa2a497589a02004e83e10e2"
     weidaiBankAddress = "0x156E7b05073A8AD3C867b1362bb917696dCCA3f2"
@@ -57,11 +56,11 @@ let testSetup = async (accounts) => {
 }
 
 contract('kharon 1', accounts => {
-  
+
     const primaryOptions = { from: accounts[0], gas: "0x6091b7" }
-  
+
     setup(async () => {
-        await testSetup(accounts)
+        await testSetup(accounts, 1000)
     })
 
     test('demandPayment on weidai, get no reward, burn weidai, bank balance increases', async () => {
@@ -90,11 +89,11 @@ contract('kharon 1', accounts => {
 })
 
 contract('kharon 2', accounts => {
-  
+
     const primaryOptions = { from: accounts[0], gas: "0x6091b7" }
-  
+
     setup(async () => {
-        await testSetup(accounts)
+        await testSetup(accounts, 1000)
     })
 
     test("demandToll on scarcity returns 0 and does nothing", async () => {
@@ -111,11 +110,11 @@ contract('kharon 2', accounts => {
 })
 
 contract('kharon 3', accounts => {
-  
+
     const primaryOptions = { from: accounts[0], gas: "0x6091b7" }
-  
+
     setup(async () => {
-        await testSetup(accounts)
+        await testSetup(accounts, 1000)
     })
 
     test('demandPayment on dai, get no reward, behodler balanced reduced by 2.4%, withdraw balance of weidai worth 2.4%', async () => {
@@ -138,6 +137,24 @@ contract('kharon 3', accounts => {
 
         const weiDaiBalanceOfBankAfter = (await weidaiInstance.balanceOf(weidaiBankAddress).call({ from: primary })).toString()
         assert.equal(weiDaiBalanceOfBankAfter, "2400")
+
+    })
+})
+
+contract('kharon 4', accounts => {
+
+    const primaryOptions = { from: accounts[0], gas: "0x6091b7" }
+
+    setup(async () => {
+        await testSetup(accounts, 999)
+    })
+
+    test('setting scarcityBurnCutoff to be less than token scarcityObligations returns 0 and does nothing', async () => {
+        await scarcityInstance.approve(mockBehodlerInstance.address, "100000", primaryOptions)
+        await mockBehodlerInstance.demandPaymentInvoker(scarcityAddress, "100000", accounts[0], primaryOptions)
+
+        const latestDemandPaymentResult = (await mockBehodlerInstance.latestDemandPaymentResult(primaryOptions)).toString()
+        assert.equal(latestDemandPaymentResult, "0")
 
     })
 })

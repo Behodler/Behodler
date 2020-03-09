@@ -1,11 +1,11 @@
 Kharon 
 make a mock behodler that has a method for calling demandPayment. Seed kharon with this. The mock should have a tokenScarcityObligations method for tokenScarcityObligations
-    demandToll on scarcity returns 0 and does nothing --BUSY
-    setting scarcityBurnCutoff to be less than token scarcityObligations returns 0 and does nothing
-    calling toll for other cases returns 2.4%
-    mock prometheus returns set number: if dai, weidai is donated according to split rate
-                                        if scarcity, entire fee is burnt, no donations
-                                        if token for which pyrotoken exists, bellows reserve increases by fee, donation increases
+    demandToll on scarcity returns 0 and does nothing --DONE
+    setting scarcityBurnCutoff to be less than token scarcityObligations returns 0 and does nothing --DONE
+    calling toll for other cases returns 2.4% --DONE
+    mock prometheus returns set number: if dai, weidai is donated according to split rate --DONE
+                                        if scarcity, entire fee is burnt, no donations --NOT SURE IF POSSIBLE, might have to test with behodler
+                                        if token for which pyrotoken exists, bellows reserve increases by fee, donation increases -- BUSY
                                         if token not legit, revert
     
 Prometheus
@@ -14,6 +14,6 @@ seed kharon as sender
     for token that has a pyrotoken, take half token value, wrap in pyrotoken and send to buyer
 
 Behodler
-
+ -remember to check if scarcity is burnt, donated etc correctly
 
 
