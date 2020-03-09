@@ -79,7 +79,10 @@ contract Kharon is Secondary{
 		}else if(token == scarcityAddress) {
 			Scarcity(token).burn(netToll);
 		}else if(token == weidaiAddress){
+			uint thisDonationSplit = PatienceRegulationEngine.getDonationSplit(address(this));
+			PatienceRegulationEngine.setDonationSplit(donationSplit);
 			WeiDaiLike(token).burn(address(this), netToll);
+			PatienceRegulationEngine.setDonationSplit(thisDonationSplit);
 		}
 		 else if(tokenRegistry.baseTokenMapping(token) != address(0)){
 			bellows.open(token,amountToBurn);
