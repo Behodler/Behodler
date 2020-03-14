@@ -32,7 +32,7 @@ contract Kharon is Secondary{
 	address public Dai;
 	address public scarcityAddress;
 	address weidaiAddress;
-	address donationAddress;
+	address public donationAddress;
 	uint scarcityBurnCuttoff;
 
 	function seed (address bl, address bh, address pm, address pr, address ban,address dai, address weidai, address scar, uint cut, address d) external onlyPrimary {
@@ -57,9 +57,9 @@ contract Kharon is Secondary{
 		return 0;
 	}
 
-	function demandPayment (address token, uint value, address buyer) external returns (uint) {
+	function demandPayment (address token, uint value, address buyer) external returns (uint tollValue) {
 		require(msg.sender == address(behodler), "only Behodler can invoke this function");
-		uint tollValue = toll(token,value);
+		tollValue = toll(token,value);
 		if(tollValue == 0)
 			return 0;
 
@@ -70,8 +70,7 @@ contract Kharon is Secondary{
 		//get split rate and calculate portion to burn. Remaining is a donation
 		uint donationSplit = PatienceRegulationEngine.getDonationSplit(buyer);
 		uint netSplitRate = uint(100).sub(donationSplit);
-		uint amountToBurn = netToll.mul(100).div(netSplitRate);
-
+		uint amountToBurn = netToll.mul(netSplitRate).div(100);
 		if(token == Dai){
 			ERC20Like(token).approve(WeiDaiBank,uint(-1));
 			PatienceRegulationEngine.buyWeiDai(netToll,donationSplit);
@@ -85,12 +84,12 @@ contract Kharon is Secondary{
 			PatienceRegulationEngine.setDonationSplit(thisDonationSplit);
 		}
 		 else if(tokenRegistry.baseTokenMapping(token) != address(0)){
+			ERC20Like(token).approve(address(bellows),amountToBurn);
 			bellows.open(token,amountToBurn);
 		}
 		else {
 			revert("invalid token trade.");
 		}
-		return tollValue;
 	}
 
 	function withdrawDonations(address token) external onlyPrimary{

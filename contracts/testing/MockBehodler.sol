@@ -27,6 +27,10 @@ contract MockBehodler
     }
 
     function mintScarcity() public {
-        ScarcityLike(scarcityAddress).mint(msg.sender,10000);
+       mintScarcityCustom(10000);
+    }
+
+    function mintScarcityCustom(uint value) public {
+        ScarcityLike(scarcityAddress).mint(msg.sender,value);
     }
 }

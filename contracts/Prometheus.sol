@@ -37,13 +37,17 @@ contract Prometheus is Secondary {
 
 	function stealFlame(address token, uint kharonToll, address buyer) external returns (uint){//takes from behodler and returns amountTakenNum
 		require(msg.sender == kharonAddress,"only Kharon can invoke this function");
-		if(token == scarcity || token == weiDai || token == dai)
-			return 0;
 		uint gift = kharonToll.div(2);
+		if(token == scarcity || token == weiDai || token == dai || gift == 0)
+			return 0;
+
 		require(ERC20Like(token).transferFrom(kharonAddress,address(this),gift),"prometheus flame theft failed.");
 
 		//gifting logic
-		PyroTokenLike pyroToken = PyroTokenLike(tokenRegistry.baseTokenMapping(token));
+		address pyroTokenAddress = tokenRegistry.baseTokenMapping(token);
+		require(pyroTokenAddress != address(0),"token not registered for trade");
+		PyroTokenLike pyroToken = PyroTokenLike(pyroTokenAddress);
+		ERC20Like(token).approve(pyroTokenAddress,uint(-1));
 		pyroToken.engulf(buyer, gift);
 		return gift;
 	}
