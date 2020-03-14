@@ -1,6 +1,8 @@
 pragma solidity  0.6;
 import "../contractFacades/KharonLike.sol";
 import "../contractFacades/ERC20Like.sol";
+import "../contractFacades/ScarcityLike.sol";
+
 contract MockBehodler
 {
     KharonLike kharon;
@@ -14,7 +16,6 @@ contract MockBehodler
     }
 
     function demandPaymentInvoker(address token, uint value, address buyer) external {
-        if(token!=scarcityAddress)
         ERC20Like(token).transferFrom(buyer,address(this),value);
         ERC20Like(token).approve(kharonAddress,value);
         latestDemandPaymentResult = kharon.demandPayment(token,value,buyer);
@@ -25,4 +26,7 @@ contract MockBehodler
         return 10000;
     }
 
+    function mintScarcity() public {
+        ScarcityLike(scarcityAddress).mint(msg.sender,10000);
+    }
 }

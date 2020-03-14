@@ -63,7 +63,7 @@ contract Kharon is Secondary{
 		if(tollValue == 0)
 			return 0;
 
-		require(ERC20Like(token).transferFrom(msg.sender,address(this), tollValue),"toll taking failed");
+		require(ERC20Like(token).transferFrom(msg.sender, address(this), tollValue),"toll taking failed");
 		ERC20Like(token).approve(address(prometheus),uint(-1));
 		uint reward = prometheus.stealFlame(token,tollValue, buyer);
 		uint netToll = tollValue.sub(reward);

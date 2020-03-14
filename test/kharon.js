@@ -55,106 +55,129 @@ let testSetup = async (accounts, cutoff) => {
     donationAccount = accounts[5]
 }
 
-contract('kharon 1', accounts => {
+// contract('kharon 1', accounts => {
+
+//     const primaryOptions = { from: accounts[0], gas: "0x6091b7" }
+
+//     setup(async () => {
+//         await testSetup(accounts, 1000)
+//     })
+
+//     test('demandPayment on weidai, get no reward, burn weidai, bank balance increases', async () => {
+//         const preInstance = (await new web3.eth.Contract(preABI, preAddress)).methods
+//         await mockDaiInstance.approve(weidaiBankAddress, "1000").send({ from: primary })
+//         await preInstance.claimWeiDai().send({ from: primary })
+//         await preInstance.buyWeiDai("1000", "20").send(primaryOptions)
+//         const initialBlock = (await web3.eth.getBlockNumber());
+//         for (let blockNumber = (await web3.eth.getBlockNumber()); blockNumber <= initialBlock + 50; blockNumber = (await time.advanceBlock()));
+//         await preInstance.claimWeiDai().send(primaryOptions)
+//         const initialWeiDaiBalance = (await weidaiInstance.balanceOf(primary).call({ from: primary })).toString()
+//         assert.equal(initialWeiDaiBalance, "100000")
+
+//         const weidaiBalanceOfBankBefore = (await weidaiInstance.balanceOf(weidaiBankAddress).call(primaryOptions)).toString()
+//         assert.equal(weidaiBalanceOfBankBefore, "0")
+
+//         await weidaiInstance.approve(mockBehodlerInstance.address, "100000").send(primaryOptions);
+//         await mockBehodlerInstance.demandPaymentInvoker(weiDaiAddress, "100000", accounts[0], primaryOptions)
+//         const weidaiBalanceOfPrimaryAfter = (await weidaiInstance.balanceOf(primary).call(primaryOptions)).toString()
+//         assert.equal(weidaiBalanceOfPrimaryAfter, "0")
+
+//         const weidaiBalanceOfBankAfter = (await weidaiInstance.balanceOf(weidaiBankAddress).call(primaryOptions)).toString()
+//         assert.equal(weidaiBalanceOfBankAfter, "480")
+//     })
+
+// })
+
+// contract('kharon 2', accounts => {
+
+//     const primaryOptions = { from: accounts[0], gas: "0x6091b7" }
+
+//     setup(async () => {
+//         await testSetup(accounts, 1000)
+//     })
+
+//     test("demandToll on scarcity returns 0 and does nothing", async () => {
+//         const scarcityBalanceBefore = (await scarcityInstance.balanceOf(primary)).toNumber()
+//         await scarcityInstance.approve(mockBehodlerInstance.address, "100000", { from: primary })
+//         await mockBehodlerInstance.demandPaymentInvoker(scarcityAddress, 10, primary)
+//         const latestResult = await mockBehodlerInstance.latestDemandPaymentResult();
+//         assert.equal(latestResult, "0")
+
+//         const scarcityBalanceAfter = (await scarcityInstance.balanceOf(primary)).toString()
+//         assert.equal(scarcityBalanceBefore, scarcityBalanceAfter)
+//     })
+
+// })
+
+// contract('kharon 3', accounts => {
+
+//     const primaryOptions = { from: accounts[0], gas: "0x6091b7" }
+
+//     setup(async () => {
+//         await testSetup(accounts, 1000)
+//     })
+
+//     test('demandPayment on dai, get no reward, behodler balanced reduced by 2.4%, withdraw balance of weidai worth 2.4%', async () => {
+//         const spendingAccount = accounts[2]
+//         await mockDaiInstance.transfer(spendingAccount, "10000").send({ from: primary });
+//         await mockDaiInstance.approve(mockBehodlerInstance.address, "100000").send({ from: spendingAccount });
+
+//         const redeemRateBefore = (await weidaiBankInstance.daiPerMyriadWeidai().call({ from: primary })).toString()
+
+//         assert.equal(redeemRateBefore, "100")
+//         const weiDaiBalanceOfBankBefore = (await weidaiInstance.balanceOf(weidaiBankAddress).call({ from: primary })).toString()
+//         assert.equal(weiDaiBalanceOfBankBefore, 0)
+//         await mockBehodlerInstance.demandPaymentInvoker(daiAddress, "10000", spendingAccount, { from: spendingAccount })
+
+//         const behodlerBalance = (await mockDaiInstance.balanceOf(mockBehodlerInstance.address).call({ from: spendingAccount })).toString()
+//         assert.equal(behodlerBalance, "9760")
+
+//         const redeemRateAfter = (await weidaiBankInstance.daiPerMyriadWeidai().call({ from: primary })).toString()
+//         assert.equal(redeemRateAfter, "995");
+
+//         const weiDaiBalanceOfBankAfter = (await weidaiInstance.balanceOf(weidaiBankAddress).call({ from: primary })).toString()
+//         assert.equal(weiDaiBalanceOfBankAfter, "2400")
+
+//     })
+// })
+
+// contract('kharon 4', accounts => {
+
+//     const primaryOptions = { from: accounts[0], gas: "0x6091b7" }
+
+//     setup(async () => {
+//         await testSetup(accounts, 999)
+//     })
+
+//     test('setting scarcityBurnCutoff to be less than token scarcityObligations returns 0 and does nothing', async () => {
+//         await scarcityInstance.approve(mockBehodlerInstance.address, "100000", primaryOptions)
+//         await mockBehodlerInstance.demandPaymentInvoker(scarcityAddress, "100000", accounts[0], primaryOptions)
+
+//         const latestDemandPaymentResult = (await mockBehodlerInstance.latestDemandPaymentResult(primaryOptions)).toString()
+//         assert.equal(latestDemandPaymentResult, "0")
+
+//     })
+// })
+
+
+contract('kharon 5', accounts => {
 
     const primaryOptions = { from: accounts[0], gas: "0x6091b7" }
 
     setup(async () => {
-        await testSetup(accounts, 1000)
+        await testSetup(accounts, 100000)
+        await scarcityInstance.setBehodler(mockBehodlerInstance.address, primaryOptions)
+        await mockBehodlerInstance.mintScarcity(primaryOptions)
     })
 
-    test('demandPayment on weidai, get no reward, burn weidai, bank balance increases', async () => {
-        const preInstance = (await new web3.eth.Contract(preABI, preAddress)).methods
-        await mockDaiInstance.approve(weidaiBankAddress, "1000").send({ from: primary })
-        await preInstance.claimWeiDai().send({ from: primary })
-        await preInstance.buyWeiDai("1000", "20").send(primaryOptions)
-        const initialBlock = (await web3.eth.getBlockNumber());
-        for (let blockNumber = (await web3.eth.getBlockNumber()); blockNumber <= initialBlock + 50; blockNumber = (await time.advanceBlock()));
-        await preInstance.claimWeiDai().send(primaryOptions)
-        const initialWeiDaiBalance = (await weidaiInstance.balanceOf(primary).call({ from: primary })).toString()
-        assert.equal(initialWeiDaiBalance, "100000")
-
-        const weidaiBalanceOfBankBefore = (await weidaiInstance.balanceOf(weidaiBankAddress).call(primaryOptions)).toString()
-        assert.equal(weidaiBalanceOfBankBefore, "0")
-
-        await weidaiInstance.approve(mockBehodlerInstance.address, "100000").send(primaryOptions);
-        await mockBehodlerInstance.demandPaymentInvoker(weiDaiAddress, "100000", accounts[0], primaryOptions)
-        const weidaiBalanceOfPrimaryAfter = (await weidaiInstance.balanceOf(primary).call(primaryOptions)).toString()
-        assert.equal(weidaiBalanceOfPrimaryAfter, "0")
-
-        const weidaiBalanceOfBankAfter = (await weidaiInstance.balanceOf(weidaiBankAddress).call(primaryOptions)).toString()
-        assert.equal(weidaiBalanceOfBankAfter, "480")
-    })
-
-})
-
-contract('kharon 2', accounts => {
-
-    const primaryOptions = { from: accounts[0], gas: "0x6091b7" }
-
-    setup(async () => {
-        await testSetup(accounts, 1000)
-    })
-
-    test("demandToll on scarcity returns 0 and does nothing", async () => {
-        const scarcityBalanceBefore = (await scarcityInstance.balanceOf(primary)).toNumber()
-        await scarcityInstance.approve(mockBehodlerInstance.address, "100000", { from: primary })
-        await mockBehodlerInstance.demandPaymentInvoker(scarcityAddress, 10, primary)
-        const latestResult = await mockBehodlerInstance.latestDemandPaymentResult();
-        assert.equal(latestResult, "0")
-
-        const scarcityBalanceAfter = (await scarcityInstance.balanceOf(primary)).toString()
-        assert.equal(scarcityBalanceBefore, scarcityBalanceAfter)
-    })
-
-})
-
-contract('kharon 3', accounts => {
-
-    const primaryOptions = { from: accounts[0], gas: "0x6091b7" }
-
-    setup(async () => {
-        await testSetup(accounts, 1000)
-    })
-
-    test('demandPayment on dai, get no reward, behodler balanced reduced by 2.4%, withdraw balance of weidai worth 2.4%', async () => {
-        const spendingAccount = accounts[2]
-        await mockDaiInstance.transfer(spendingAccount, "10000").send({ from: primary });
-        await mockDaiInstance.approve(mockBehodlerInstance.address, "100000").send({ from: spendingAccount });
-
-        const redeemRateBefore = (await weidaiBankInstance.daiPerMyriadWeidai().call({ from: primary })).toString()
-
-        assert.equal(redeemRateBefore, "100")
-        const weiDaiBalanceOfBankBefore = (await weidaiInstance.balanceOf(weidaiBankAddress).call({ from: primary })).toString()
-        assert.equal(weiDaiBalanceOfBankBefore, 0)
-        await mockBehodlerInstance.demandPaymentInvoker(daiAddress, "10000", spendingAccount, { from: spendingAccount })
-
-        const behodlerBalance = (await mockDaiInstance.balanceOf(mockBehodlerInstance.address).call({ from: spendingAccount })).toString()
-        assert.equal(behodlerBalance, "9760")
-
-        const redeemRateAfter = (await weidaiBankInstance.daiPerMyriadWeidai().call({ from: primary })).toString()
-        assert.equal(redeemRateAfter, "995");
-
-        const weiDaiBalanceOfBankAfter = (await weidaiInstance.balanceOf(weidaiBankAddress).call({ from: primary })).toString()
-        assert.equal(weiDaiBalanceOfBankAfter, "2400")
-
-    })
-})
-
-contract('kharon 4', accounts => {
-
-    const primaryOptions = { from: accounts[0], gas: "0x6091b7" }
-
-    setup(async () => {
-        await testSetup(accounts, 999)
-    })
-
-    test('setting scarcityBurnCutoff to be less than token scarcityObligations returns 0 and does nothing', async () => {
-        await scarcityInstance.approve(mockBehodlerInstance.address, "100000", primaryOptions)
-        await mockBehodlerInstance.demandPaymentInvoker(scarcityAddress, "100000", accounts[0], primaryOptions)
-
-        const latestDemandPaymentResult = (await mockBehodlerInstance.latestDemandPaymentResult(primaryOptions)).toString()
-        assert.equal(latestDemandPaymentResult, "0")
-
+    test('demand payment on scarcity', async () => {
+        const scarcityTotal = (await scarcityInstance.totalSupply(primaryOptions)).toNumber()
+        assert.equal(scarcityTotal, 10000)
+        const primaryBalance = (await scarcityInstance.balanceOf(accounts[0], primaryOptions)).toNumber()
+        assert.equal(primaryBalance, 10000)
+        await scarcityInstance.approve(mockBehodlerInstance.address, 10000, primaryOptions)
+        await mockBehodlerInstance.demandPaymentInvoker(scarcityInstance.address, 10000, accounts[0])
+        const scarcityTotalAfter = (await scarcityInstance.totalSupply(primaryOptions)).toNumber()
+        assert.equal(scarcityTotalAfter, 9760)
     })
 })
