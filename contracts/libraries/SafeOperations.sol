@@ -24,6 +24,17 @@ library SafeOperations {
 		return product;
 	}
 
+	function sqrtImprecise(uint x) internal pure returns (uint y) {
+		uint z = (x + 1) / 2;
+		y = x;
+		while (z < y) {
+			y = z;
+			z = (x / z + z) / 2;
+		}
+		if(y>x)
+			y = 0;
+	}
+
 	function sqrt(uint x) internal pure returns (uint y) {
 		uint z = (x + 1) / 2;
 		y = x;

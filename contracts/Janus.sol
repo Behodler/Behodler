@@ -35,12 +35,12 @@ contract Janus is Secondary{
 	function tokenToToken(address sender, address input, address output, uint value, uint minPrice, uint maxPrice) private returns (uint bought) {
 		require(input!=output,"tokens can't trade against themselves.");
 		if(input == scarcityAddress){
-			bought = behodler.sellScarcity(sender, output, value,maxPrice);
+			bought = behodler.sellScarcityDelegate(sender, output, value,maxPrice);
 		}else if (output == scarcityAddress){
-			bought = behodler.buyScarcity(sender, input, value,minPrice);
+			bought = behodler.buyScarcityDelegate(sender, input, value,minPrice);
 		}else {
-			uint scx = behodler.buyScarcity(sender, input, value,minPrice);
-			bought = behodler.sellScarcity(sender, output, scx,maxPrice);
+			uint scx = behodler.buyScarcityDelegate(sender, input, value,minPrice);
+			bought = behodler.sellScarcityDelegate(sender, output, scx,maxPrice);
 		}
 	}
 

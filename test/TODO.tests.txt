@@ -1,5 +1,6 @@
 
 Behodler and Chronos
+    in first buy and sell test, implement selling
 Janus
 
 
