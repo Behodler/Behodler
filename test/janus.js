@@ -21,9 +21,6 @@ contract('Scarcity', accounts => {
 		primary = accounts[0]
 	})
 
-	test("repeated trade should decrease slippage", async () => {
-	
-	})
 
 	test("trade between same token fails", async () => {
 	
@@ -40,5 +37,9 @@ contract('Scarcity', accounts => {
 
 	test("repeated back and forth trade should decrease slippage per trade", async () => {
 	
+	})
+
+	test("repeated back and forth trade should increase scarcity price of both tokens", async () => {
+
 	})
 })

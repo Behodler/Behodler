@@ -80,7 +80,6 @@ contract Behodler is Secondary
 		require(minPrice == 0 || scarcityToPrint >= minPrice.mul(amountToPurchaseWith), "price slippage exceeded tolerance.");
 		require(scarcityToPrint > 0, "No scarcity generated.");
 
-
 		//bookkeeping
 		tokenScarcityObligations[tokenAddress] = finalScarcity;
 		//issue scarcity
@@ -89,7 +88,7 @@ contract Behodler is Secondary
 		return scarcityToPrint;
 	}
 
-	function sell (address tokenAddress, uint scarcityValue, address seller, uint maxPrice) private returns (uint){
+	function sell (address tokenAddress, uint scarcityValue, address seller, uint maxPrice) private returns (uint tokensToSendToUser){
 		lachesis.cut(tokenAddress);
 		address scarcityAddress = getScarcityAddress();
 		Scarcity(scarcityAddress).transferToBehodler(seller, scarcityValue);
@@ -106,16 +105,15 @@ contract Behodler is Secondary
 		uint tokenObligations = currentObligation.square().safeRightShift(factor);
 		uint tokensAfter = scarcityAfter.square().safeRightShift(factor);
 
-		uint tokensToSendToUser = (tokenObligations.sub(tokensAfter));//no spread
+		tokensToSendToUser = (tokenObligations.sub(tokensAfter));//no spread
 
 		require(tokensToSendToUser > 0, "No tokens released.");
-		require(maxPrice > 0 && scarcityAfter <= maxPrice.mul(tokensToSendToUser), "price slippage exceeded tolerance.");
+		require(maxPrice == 0 || scarcityAfter <= maxPrice.mul(tokensToSendToUser), "price slippage exceeded tolerance.");
 
 		tokenScarcityObligations[tokenAddress] = scarcityAfter;
 		ERC20Like(tokenAddress).transfer(seller,tokensToSendToUser);
 		emit scarcitySold(tokenAddress,scarcityValue, tokensToSendToUser);
 		chronos.stamp(tokenAddress,scarcityValue,tokensToSendToUser);
-		return tokensToSendToUser;
 	}
 
 	event scarcitySold(address token, uint scx,uint tokenValue);

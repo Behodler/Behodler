@@ -6,8 +6,8 @@ import "../node_modules/openzeppelin-solidity/contracts/ownership/Secondary.sol"
 	While one would think that logging would suffice, this isn't accessible to contracts.
 	Chronos keeps a moving average of the last 10, 100 and 1000 trades for a token pair.
 	This provides attack resistant stability for anyone wishing to use it as an oracle.
-	Trading pairs can be held as mapping(address=>mapping(address=uint)). If a pair of [X][Y] has a non zero value and a [Y][X] trade comes in, then it is
-	just inverted and added to the [X][Y] running average.
+	Scarcity (Scx) is the unit of account in the Behodler dapp and so all data is recorded in
+	terms of Scarcity
  */
 
 
@@ -20,6 +20,8 @@ contract RingAverage{
 
 	constructor (uint l) public {
 		length = l;
+		first = 0;
+		last = l-1;
 	}
 
 	function push(uint value) external {
@@ -49,14 +51,19 @@ contract Chronos is Secondary {
 	mapping (address => RingAverage[]) public stampData; // tokens per billion scx
 	uint BILLION = 10**9;
 
+	modifier onlyBehodler(){
+		require(behodlerAddress != address(0), "Behodler contract not set.");
+		require(msg.sender == behodlerAddress, "Only the Behodler contract can invoke this function.");
+		_;
+	}
+
 	function seed (address beh) external {
 		behodlerAddress = beh;
 	}
 
-	function stamp(address tokenAddress, uint scxValue, uint tokenValue) public onlyPrimary {
-		require(msg.sender == behodlerAddress,"only Behodler can invoke this function");
+	function stamp(address tokenAddress, uint scxValue, uint tokenValue) public onlyBehodler {
 		uint gigaValue = tokenValue*BILLION;
-		if(tokenValue*BILLION<tokenValue)
+		if(gigaValue<scxValue)
 			return;
 		uint average = gigaValue/scxValue;
 		if(!initialized[tokenAddress]){
