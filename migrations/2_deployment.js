@@ -80,6 +80,7 @@ module.exports = async function (deployer, network, accounts) {
 
 		await registryInstance.addToken("pyroMock1", "PMC1", mock1Instance.address)
 		await registryInstance.addToken("pyroMock2", "PMC2", mock2Instance.address)
+		await registryInstance.addToken("pyroWeth", "PWeth", mockWethInstance.address)
 
 	}
 	else if (network === 'main' || network == 'main-fork') {

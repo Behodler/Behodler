@@ -83,7 +83,7 @@ contract Behodler is Secondary
 		//bookkeeping
 		tokenScarcityObligations[tokenAddress] = finalScarcity;
 		//issue scarcity
-		Scarcity(getScarcityAddress()).mint(msg.sender, scarcityToPrint);
+		Scarcity(getScarcityAddress()).mint(purchaser, scarcityToPrint);
 		emit scarcityBought(tokenAddress,scarcityToPrint, value);
 		return scarcityToPrint;
 	}

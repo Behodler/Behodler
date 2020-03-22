@@ -10,7 +10,8 @@ contract MockWeth is ERC20
 
 	function withdraw(uint value) external {
 		_burn(msg.sender,value);
-		(bool success, ) = msg.sender.call.value(value)("");
+		address payable sender = msg.sender;
+		(bool success, ) = sender.call.value(value)("");
 		require(success, "Unwrapping failed.");
 	}
 }

@@ -21,19 +21,23 @@ contract Janus is Secondary{
 	constructor () public {
 		self = address(this);
 	}
+
+	receive() payable external {
+    }
+
 	function seed (address scx, address wet, address beh) external onlyPrimary {
 		weth = WethLike(wet);
 		scarcityAddress = scx;
 		behodler = Behodler(beh);
 	}
 
-	//user must authorize behodler
+	//user must authorize behodler to take input token
 	function tokenToToken(address input, address output, uint value, uint minPrice, uint maxPrice) external returns (uint bought) {
 		return tokenToToken(msg.sender,input,output,value,minPrice,maxPrice);
 	}
 
 	function tokenToToken(address sender, address input, address output, uint value, uint minPrice, uint maxPrice) private returns (uint bought) {
-		require(input!=output,"tokens can't trade against themselves.");
+	require(input!=output,"input token must be different to output token");
 		if(input == scarcityAddress){
 			bought = behodler.sellScarcityDelegate(sender, output, value,maxPrice);
 		}else if (output == scarcityAddress){
@@ -45,7 +49,8 @@ contract Janus is Secondary{
 	}
 
 	function ethToToken(address output, uint minPrice, uint maxPrice) external payable returns (uint bought) {
-		weth.deposit.value(msg.value); //send eth?
+		require(msg.value>0, "no eth sent");
+		weth.deposit.value(msg.value)();
 		weth.transfer(msg.sender,msg.value);
 		bought = tokenToToken(msg.sender,address(weth),output,msg.value,minPrice,maxPrice);
 	}
