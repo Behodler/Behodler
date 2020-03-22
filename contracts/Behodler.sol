@@ -77,7 +77,7 @@ contract Behodler is Secondary
 		uint finalScarcity = (finalTokens.safeLeftShift(factor)).sqrtImprecise();
 		uint scarcityToPrint = finalScarcity.sub(tokenScarcityObligations[tokenAddress]);
 
-		require(minPrice == 0 || scarcityToPrint >= minPrice.mul(amountToPurchaseWith), "price slippage exceeded tolerance.");
+		require(minPrice == 0 || scarcityToPrint >= minPrice.mul(amountToPurchaseWith), "price slippage (min) exceeded tolerance.");
 		require(scarcityToPrint > 0, "No scarcity generated.");
 
 		//bookkeeping
@@ -108,7 +108,7 @@ contract Behodler is Secondary
 		tokensToSendToUser = (tokenObligations.sub(tokensAfter));//no spread
 
 		require(tokensToSendToUser > 0, "No tokens released.");
-		require(maxPrice == 0 || scarcityAfter <= maxPrice.mul(tokensToSendToUser), "price slippage exceeded tolerance.");
+		require(maxPrice == 0 || scarcityToSell <= maxPrice.mul(tokensToSendToUser), "price slippage (max) exceeded tolerance.");
 
 		tokenScarcityObligations[tokenAddress] = scarcityAfter;
 		ERC20Like(tokenAddress).transfer(seller,tokensToSendToUser);

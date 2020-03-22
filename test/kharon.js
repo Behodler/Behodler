@@ -113,7 +113,7 @@ contract('kharon 2', accounts => {
         assert.equal(behodlerBalance, "9760")
 
         const redeemRateAfter = parseInt((await weidaiBankInstance.daiPerMyriadWeidai().call({ from: primary })).toString())
-        assert.isAtLeast(redeemRateAfter, 987);
+        assert.isAtLeast(redeemRateAfter, 975);
         assert.isAtMost(redeemRateAfter, 995);
 
         const weiDaiBalanceOfBankAfter = (await weidaiInstance.balanceOf(weidaiBankAddress).call({ from: primary })).toString()

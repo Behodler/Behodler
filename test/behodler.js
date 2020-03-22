@@ -215,7 +215,7 @@ contract('behodler', accounts => {
 		let amountToBuy = web3.utils.toWei("10000")
 
 		await mock1Instance.approve(behodlerInstance.address, amountToBuy, primaryOptions)
-		await expectThrow(behodlerInstance.buyScarcity(mock1Instance.address, amountToBuy, web3.utils.toWei("2000"), primaryOptions), "price slippage exceeded tolerance.");
+		await expectThrow(behodlerInstance.buyScarcity(mock1Instance.address, amountToBuy, web3.utils.toWei("2000"), primaryOptions), "price slippage (min) exceeded tolerance.");
 
 	})
 
@@ -223,7 +223,7 @@ contract('behodler', accounts => {
 		
 		let amountToSell =  web3.utils.toWei("10")
 		await scarcityInstance.approve(behodlerInstance.address, "25837162739794447809457347256")
-		await expectThrow(behodlerInstance.sellScarcity(mock1Instance.address, amountToSell, 1, primaryOptions),"price slippage exceeded tolerance.")
+		await expectThrow(behodlerInstance.sellScarcity(mock1Instance.address, amountToSell, 1, primaryOptions),"price slippage (max) exceeded tolerance.")
 
 	})
 
