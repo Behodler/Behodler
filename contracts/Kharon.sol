@@ -34,6 +34,12 @@ contract Kharon is Secondary{
 	address weidaiAddress;
 	address public donationAddress;
 	uint scarcityBurnCuttoff;
+	uint tollRate = 24;
+
+	function setTollRate(uint t) public onlyPrimary {
+		require(t<1000, "toll rate is a percentage expressed as a number between 0 and 1000");
+		tollRate = t;
+	}
 
 	function seed (address bl, address bh, address pm, address pr, address ban,address dai, address weidai, address scar, uint cut, address d) external onlyPrimary {
 		bellows = Bellows(bl);
@@ -50,9 +56,9 @@ contract Kharon is Secondary{
 	}
 
 	function toll(address token, uint value) public view returns (uint){//percentage expressed as number between 0 and 1000
-		//if the token isn't scarcity, we burn 2.4%. If it is scarcity, we first check if we should burn anymore
+		//if the token isn't scarcity, we burn toll rate. If it is scarcity, we first check if we should burn anymore
 		if(token != scarcityAddress || behodler.tokenScarcityObligations(token) <= scarcityBurnCuttoff){
-			return uint(24).mul(value).div(1000);
+			return uint(tollRate).mul(value).div(1000);
 		}
 		return 0;
 	}

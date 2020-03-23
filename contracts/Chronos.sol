@@ -12,7 +12,8 @@ import "../node_modules/openzeppelin-solidity/contracts/ownership/Secondary.sol"
 
 
 contract RingAverage{
-	uint[] data;
+	uint[] public data;
+	uint[] public blockStamp;
 	uint public total;
 	uint public first;
 	uint public last;
@@ -29,12 +30,14 @@ contract RingAverage{
 
 		if(data.length < length) {
 			data.push(value);
+			blockStamp.push(block.number);
 		}
 		else{
 			total -= data[first];
 			first = (first + 1) % length;
 			last = (last + 1) % length;
 			data[last] = value;
+			blockStamp[last] = block.number;
 		}
 	}
 
