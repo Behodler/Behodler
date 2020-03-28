@@ -24,7 +24,7 @@ contract Scarcity is ERC20, Secondary
 		_burn(msg.sender,value);
 	}
 
-	function transferToBehodler(address holder, uint value) external returns (bool){
+	function transferToBehodler(address holder, uint value) external onlyBehodler returns (bool){
 		_transfer(holder, behodler, value);
 		return true;
 	}
