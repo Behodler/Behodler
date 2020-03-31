@@ -15,7 +15,6 @@ const MockBehodler = artifacts.require("MockBehodler")
 const messageObjectFileLocation = '../messageLocation.json'
 const fs = require('fs')
 
-
 module.exports = async function (deployer, network, accounts) {
 	var scarcityInstance, lachesisInstance, behodlerInstance, mock1Instance, mock2Instance, mockWethInstance, mockInvalidTokenInstance
 	var kharonInstance, prometheusInstance, janusInstance, chronosInstance, bellowsInstance, registryInstance, mockBehodlerInstance
@@ -62,8 +61,6 @@ module.exports = async function (deployer, network, accounts) {
 	if (network === 'development') {
 
 		let contracts = JSON.parse(fs.readFileSync(messageObjectFileLocation))
-		console.log("Incoming Contracts")
-		console.log(JSON.stringify(contracts, null, 4))
 		daiAddress = contracts.dai;
 		weiDaiAddress = contracts.weiDai;
 		bankAddress = contracts.bank
@@ -127,9 +124,7 @@ function writeNetworkABIs(network, abiAddressArray) {
 	if (exists) {
 		try {
 			dataObject = JSON.parse(fs.readFileSync(fileLocation))
-			console.log('successfully parsed')
 		} catch{
-			console.log('catching')
 			dataObject = []
 		}
 	}
@@ -151,13 +146,9 @@ function populateAbiArray(addressArray) {
 	let baseLocation = './build/contracts/'
 	let abiAddressArray = []
 
-	console.log('address array')
-	console.log(JSON.stringify(addressArray, null, 4))
 	addressArray.forEach((contract) => {
-		console.log('each: ' + JSON.stringify(contract, null, 4))
 		const abi = JSON.parse(fs.readFileSync(baseLocation + contract.name + '.json')).abi
 		abiAddressArray.push({ contract: contract.name, address: contract.address, abi })
 	})
-	console.log('finished populate')
 	return abiAddressArray
 }
