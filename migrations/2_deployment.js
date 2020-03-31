@@ -15,10 +15,11 @@ const MockBehodler = artifacts.require("MockBehodler")
 const messageObjectFileLocation = '../messageLocation.json'
 const fs = require('fs')
 
+
 module.exports = async function (deployer, network, accounts) {
 	var scarcityInstance, lachesisInstance, behodlerInstance, mock1Instance, mock2Instance, mockWethInstance, mockInvalidTokenInstance
 	var kharonInstance, prometheusInstance, janusInstance, chronosInstance, bellowsInstance, registryInstance, mockBehodlerInstance
-
+	let contractList = []
 	await deployer.deploy(Scarcity)
 	await deployer.deploy(Lachesis)
 	await deployer.deploy(Behodler)
@@ -38,6 +39,17 @@ module.exports = async function (deployer, network, accounts) {
 	chronosInstance = await Chronos.deployed()
 	bellowsInstance = await Bellows.deployed()
 	registryInstance = await Registry.deployed()
+
+	contractList.push({ name: 'Behodler', address: behodlerInstance.address })
+	contractList.push({ name: 'Bellows', address: bellowsInstance.address })
+	contractList.push({ name: 'Chronos', address: chronosInstance.address })
+	contractList.push({ name: 'Janus', address: janusInstance.address })
+	contractList.push({ name: 'Kharon', address: kharonInstance.address })
+	contractList.push({ name: 'Lachesis', address: lachesisInstance.address })
+	contractList.push({ name: 'Prometheus', address: prometheusInstance.address })
+	contractList.push({ name: 'PyroTokenRegistry', address: registryInstance.address })
+	contractList.push({ name: 'Scarcity', address: scarcityInstance.address })
+	contractList.push({ name: 'PyroToken', address: '' })
 
 	await behodlerInstance.seed(lachesisInstance.address, kharonInstance.address, janusInstance.address, chronosInstance.address)
 	await chronosInstance.seed(behodlerInstance.address)
@@ -63,6 +75,11 @@ module.exports = async function (deployer, network, accounts) {
 		await deployer.deploy(MockWeth)
 		await deployer.deploy(MockBehodler)
 
+		contractList['MockToken1'] = MockToken1.address
+		contractList['MockToken2'] = MockToken1.address
+		contractList['MockWeth'] = MockToken1.address
+		contractList['MockBehodler'] = MockToken1.address
+
 		mock1Instance = await MockToken1.deployed()
 		mock2Instance = await MockToken2.deployed()
 		mockWethInstance = await MockWeth.deployed()
@@ -71,6 +88,11 @@ module.exports = async function (deployer, network, accounts) {
 		wethAddress = mockWethInstance.address
 
 		donationAddress = accounts[5]
+
+		contractList.push({ name: 'MockToken1', address: mock1Instance.address })
+		contractList.push({ name: 'MockToken2', address: mock2Instance.address })
+		contractList.push({ name: 'MockWeth', address: mockWethInstance.address })
+		contractList.push({ name: 'MockBehodler', address: mockBehodlerInstance.address })
 
 		await mockBehodlerInstance.seed(kharonInstance.address, scarcityInstance.address)
 
@@ -89,7 +111,53 @@ module.exports = async function (deployer, network, accounts) {
 	else if (network == 'kovan-fork' || network == 'kovan') {
 
 	}
+	const abiAddressArray = populateAbiArray(contractList)
+	writeNetworkABIs(network, abiAddressArray)
 	await prometheusInstance.seed(kharonInstance.address, scarcityInstance.address, weiDaiAddress, daiAddress, registryInstance.address)
 	await kharonInstance.seed(bellowsInstance.address, behodlerInstance.address, prometheusInstance.address, preAddress, bankAddress, daiAddress, weiDaiAddress, scarcityInstance.address, '10000000000000000000', donationAddress)
 	await janusInstance.seed(scarcityInstance.address, wethAddress, behodlerInstance.address)
+}
+
+
+function writeNetworkABIs(network, abiAddressArray) {
+	const fileLocation = './BehodlerABIAddressMapping.json'
+	const fs = require('fs')
+	var exists = fs.existsSync(fileLocation)
+	let dataObject = []
+	if (exists) {
+		try {
+			dataObject = JSON.parse(fs.readFileSync(fileLocation))
+			console.log('successfully parsed')
+		} catch{
+			console.log('catching')
+			dataObject = []
+		}
+	}
+	let found = false
+	for (let i = 0; i < dataObject.length; i++) {
+		if (dataObject[i].name == network) {
+			dataObject[i].list = abiAddressArray
+			found = true
+		}
+	}
+	if (!found)
+		dataObject.push({ name: network, list: abiAddressArray })
+	let output = JSON.stringify(dataObject, null, 4)
+	fs.writeFileSync(fileLocation, output)
+}
+
+function populateAbiArray(addressArray) {
+	const fs = require('fs')
+	let baseLocation = './build/contracts/'
+	let abiAddressArray = []
+
+	console.log('address array')
+	console.log(JSON.stringify(addressArray, null, 4))
+	addressArray.forEach((contract) => {
+		console.log('each: ' + JSON.stringify(contract, null, 4))
+		const abi = JSON.parse(fs.readFileSync(baseLocation + contract.name + '.json')).abi
+		abiAddressArray.push({ contract: contract.name, address: contract.address, abi })
+	})
+	console.log('finished populate')
+	return abiAddressArray
 }
