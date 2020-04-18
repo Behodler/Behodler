@@ -72,10 +72,6 @@ module.exports = async function (deployer, network, accounts) {
 		await deployer.deploy(MockWeth)
 		await deployer.deploy(MockBehodler)
 
-		contractList['MockToken1'] = MockToken1.address
-		contractList['MockToken2'] = MockToken1.address
-		contractList['MockWeth'] = MockToken1.address
-		contractList['MockBehodler'] = MockToken1.address
 
 		mock1Instance = await MockToken1.deployed()
 		mock2Instance = await MockToken2.deployed()
@@ -90,6 +86,7 @@ module.exports = async function (deployer, network, accounts) {
 		contractList.push({ name: 'MockToken2', address: mock2Instance.address })
 		contractList.push({ name: 'MockWeth', address: mockWethInstance.address })
 		contractList.push({ name: 'MockBehodler', address: mockBehodlerInstance.address })
+		contractList.push({ name: 'MockDai', address: daiAddress })
 
 		await mockBehodlerInstance.seed(kharonInstance.address, scarcityInstance.address)
 
