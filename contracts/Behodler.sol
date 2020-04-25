@@ -39,7 +39,7 @@ contract Behodler is Secondary
 
 		uint currentTokens = tokenScarcityObligations[tokenAddress].square().safeRightShift(factor);
 		uint finalTokens = currentTokens.add(amountToPurchaseWith);
-		uint finalScarcity = (finalTokens.safeLeftShift(factor)).sqrtImprecise();//square root failing
+		uint finalScarcity = (finalTokens.safeLeftShift(factor)).sqrtImprecise();
 		uint scarcityToPrint = finalScarcity.sub(tokenScarcityObligations[tokenAddress]);
 		avg = scarcityToPrint.div(amountToPurchaseWith);
 	}
@@ -88,6 +88,20 @@ contract Behodler is Secondary
 		return scarcityToPrint;
 	}
 
+	function buyDryRun (address tokenAddress, uint value, uint minPrice) public view returns (uint) {
+		lachesis.cut(tokenAddress);
+		uint amountToPurchaseWith = value.sub(kharon.toll(tokenAddress,value));
+
+		uint currentTokens = tokenScarcityObligations[tokenAddress].square().safeRightShift(factor);
+		uint finalTokens = currentTokens.add(amountToPurchaseWith);
+		uint finalScarcity = (finalTokens.safeLeftShift(factor)).sqrtImprecise();
+		uint scarcityToPrint = finalScarcity.sub(tokenScarcityObligations[tokenAddress]);
+
+		require(minPrice == 0 || scarcityToPrint >= minPrice.mul(amountToPurchaseWith), "price slippage (min) exceeded tolerance.");
+		require(scarcityToPrint > 0, "No scarcity generated.");
+		return scarcityToPrint;
+	}
+
 	function sell (address tokenAddress, uint scarcityValue, address seller, uint maxPrice) private returns (uint tokensToSendToUser){
 		lachesis.cut(tokenAddress);
 		address scarcityAddress = getScarcityAddress();
@@ -115,6 +129,25 @@ contract Behodler is Secondary
 		emit scarcitySold(tokenAddress,scarcityValue, tokensToSendToUser);
 		chronos.stamp(tokenAddress,scarcityValue,tokensToSendToUser);
 	}
+
+
+	function sellDryRun (address tokenAddress, uint scarcityValue, uint maxPrice) public view returns (uint tokensToSendToUser){
+		lachesis.cut(tokenAddress);
+		address scarcityAddress = getScarcityAddress();
+		uint currentObligation = tokenScarcityObligations[tokenAddress];
+		require(scarcityValue <= currentObligation,"value of scarcity sold exceeds token reserves");
+		uint scarcityToSell = scarcityValue.sub(kharon.toll(scarcityAddress,scarcityValue));
+
+		uint scarcityAfter = currentObligation.sub(scarcityToSell);
+		uint tokenObligations = currentObligation.square().safeRightShift(factor);
+		uint tokensAfter = scarcityAfter.square().safeRightShift(factor);
+
+		tokensToSendToUser = (tokenObligations.sub(tokensAfter));//no spread
+
+		require(tokensToSendToUser > 0, "No tokens released.");
+		require(maxPrice == 0 || scarcityToSell <= maxPrice.mul(tokensToSendToUser), "price slippage (max) exceeded tolerance.");
+	}
+
 
 	event scarcitySold(address token, uint scx,uint tokenValue);
 	event scarcityBought(address token, uint scx,uint tokenValue);

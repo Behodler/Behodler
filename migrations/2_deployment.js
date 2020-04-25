@@ -86,7 +86,7 @@ module.exports = async function (deployer, network, accounts) {
 		contractList.push({ name: 'MockToken2', address: mock2Instance.address })
 		contractList.push({ name: 'MockWeth', address: mockWethInstance.address })
 		contractList.push({ name: 'MockBehodler', address: mockBehodlerInstance.address })
-		contractList.push({ name: 'MockDai', address: daiAddress })
+		contractList.push({ name: 'ERC20', address: daiAddress })
 
 		await mockBehodlerInstance.seed(kharonInstance.address, scarcityInstance.address)
 
