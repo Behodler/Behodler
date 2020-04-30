@@ -48,7 +48,7 @@ contract Janus is Secondary{
 		}
 	}
 
-	function ethToToken(address output, uint minPrice, uint maxPrice) external payable returns (uint bought) {
+	function ethToToken(address output, uint minPrice, uint maxPrice) external payable returns (uint bought) { // user needs to enable eth for behodler
 		require(msg.value>0, "no eth sent");
 		weth.deposit.value(msg.value)();
 		weth.transfer(msg.sender,msg.value);
