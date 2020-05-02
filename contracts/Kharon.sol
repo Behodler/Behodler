@@ -33,8 +33,8 @@ contract Kharon is Secondary{
 	address public scarcityAddress;
 	address weidaiAddress;
 	address public donationAddress;
-	uint scarcityBurnCuttoff;
-	uint tollRate = 24;
+	uint public scarcityBurnCuttoff;
+	uint public tollRate = 24;
 
 	function setTollRate(uint t) public onlyPrimary {
 		require(t<1000, "toll rate is a percentage expressed as a number between 0 and 1000");
@@ -61,6 +61,15 @@ contract Kharon is Secondary{
 			return uint(tollRate).mul(value).div(1000);
 		}
 		return 0;
+	}
+
+	function demandPaymentRewardDryRun(address token, uint value) external view returns (uint) {
+		uint tollValue = toll(token,value);
+		if(tollValue == 0)
+			return 0;
+
+		uint reward = prometheus.stealFlameDryRun(token,tollValue);
+		return reward;
 	}
 
 	function demandPayment (address token, uint value, address buyer) external returns (uint tollValue) {
