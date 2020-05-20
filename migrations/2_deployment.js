@@ -196,12 +196,12 @@ module.exports = async function (deployer, network, accounts) {
 
 }
 
-function pausePromise(message, durationInSeconds = 3) {
+function pausePromise(message, durationInSeconds = 1) {
 	return new Promise(function (resolve, error) {
 		setTimeout(() => {
 			console.log(message)
 			return resolve()
-		}, durationInSeconds * 1000)
+		}, durationInSeconds * 100)
 	})
 }
 
