@@ -18,8 +18,9 @@
  *
  */
 const fs = require('fs')
+const mnemonicLocation = './temp/5may2020.txt'
 
-const mnemonic = fs.existsSync('./temp/list', 'utf8') ? fs.readFileSync('./temp/list', 'utf8') : ''
+const mnemonic = fs.existsSync(mnemonicLocation, 'utf8') ? fs.readFileSync(mnemonicLocation, 'utf8') : ''
 
 const HDWalletProvider = require('@truffle/hdwallet-provider');
 // const infuraKey = "fj4jll3k.....";
@@ -48,18 +49,38 @@ module.exports = {
 		// tab if you use this network and you must also set the `host`, `port` and `network_id`
 		// options below to some value.
 		//
-		development: {
+		develop: {
 			host: "127.0.0.1",     // Localhost (default: none)
 			port: 8545,            // Standard Ethereum port (default: none)
 			network_id: "*",       // Any network (default: none)
+			gas: '0x669100',
+			gasPrice: '30000000000',
+			skipDryRun: true   
 			//  gasPrice:5000000000,
 		},
-		gethdev: {
-			host: "127.0.0.1",      // Localhost (default: none)
-			port: 8545,            // Standard Ethereum port (default: none)
-			network_id: "66",       // Any network (default: none)
-			gasPrice: 5000000000,
-			gas: '7000000'
+		geth: {
+			provider: () => new HDWalletProvider(mnemonic, `http://localhost:8545`),
+			// host: "127.0.0.1",      // Localhost (default: none)
+			// port: 8545,            // Standard Ethereum port (default: none)
+			network_id: "*",       // Any network (default: none)
+			gas: '9500000',
+			gasPrice: '30000000000',
+			networkCheckTimeout: 100000,
+			from: '0x9b044074699d97910A28dC8E3831faf8f76A9c37'
+			// port: 8545,    
+			// skipDryRun: true   
+			//  gasPrice:5000000000,
+		},
+		'quicknode': {
+			provider: () => new HDWalletProvider(mnemonic, `https://throbbing-holy-water.quiknode.pro/`),
+			// host: "127.0.0.1",      // Localhost (default: none)
+			// port: 8545,            // Standard Ethereum port (default: none)
+			network_id: "1",       // Any network (default: none)
+			gas: '9500000',
+			gasPrice: '30000000000',
+			networkCheckTimeout: 100000,
+			port: 8545,    
+			skipDryRun: true 
 		},
 
 		// Another network with more advanced options...
@@ -85,14 +106,15 @@ module.exports = {
 			//   skipDryRun: true     // Skip dry run before migrations? (default: false for public nets )
 		},
 
-		'main': {
+		'infura': {
 			provider: () => new HDWalletProvider(mnemonic, `https://mainnet.infura.io/v3/879bf8d4f8d74e809de3176af688d53a`),
-			network_id: 1,       // Kovan's id
-			gas: '7000000',
-			gasPrice: '2000000000'
+			network_id: '*',       // Kovan's id
+			gas: '9500000',
+			gasPrice: '32000000000',
+			networkCheckTimeout: 100000,
 			//   confirmations: 2,    // # of confs to wait between deployments. (default: 0)
 			//   timeoutBlocks: 200,  // # of blocks before a deployment times out  (minimum/default: 50)
-			//   skipDryRun: true     // Skip dry run before migrations? (default: false for public nets )
+			skipDryRun: true     // Skip dry run before migrations? (default: false for public nets )
 		},
 
 		// Useful for private networks

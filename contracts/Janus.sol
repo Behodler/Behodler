@@ -44,7 +44,9 @@ contract Janus is Secondary{
 			bought = behodler.buyScarcityDelegate(sender, input, value,minPrice);
 		}else {
 			uint scx = behodler.buyScarcityDelegate(sender, input, value,minPrice);
-			bought = behodler.sellScarcityDelegate(sender, output, scx,maxPrice);
+			uint max = behodler.tokenScarcityObligations(output);
+			uint scxToSend = scx>max?max:scx;
+			bought = behodler.sellScarcityDelegate(sender, output, scxToSend,maxPrice);
 		}
 	}
 
