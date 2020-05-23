@@ -182,7 +182,7 @@ module.exports = async function (deployer, network, accounts) {
 			await registryInstance.addToken("PyroBAT", "PBAT", BAT)
 		}
 	}
-	
+
 	const abiAddressArray = populateAbiArray(contractList)
 	writeNetworkABIs(network, abiAddressArray)
 	if (seed) {
@@ -193,7 +193,7 @@ module.exports = async function (deployer, network, accounts) {
 		await pausePromise('seeding janus')
 		await janusInstance.seed(scarcityInstance.address, wethAddress, behodlerInstance.address)
 	}
-
+	writeScarcityLocationForSisyphus(scarcityInstance.address)
 }
 
 function pausePromise(message, durationInSeconds = 1) {
@@ -240,4 +240,9 @@ function populateAbiArray(addressArray) {
 		abiAddressArray.push({ contract: contract.name, address: contract.address, abi })
 	})
 	return abiAddressArray
+}
+
+function writeScarcityLocationForSisyphus(scx) {
+	const scarcityLocation = "/home/justin/weidai ecosystem/Sisyphus/scarcityAddress.txt"
+	fs.writeFileSync(scarcityLocation, scx)
 }
