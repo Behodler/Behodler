@@ -2,7 +2,7 @@ pragma solidity ^0.6.1;
 import "../node_modules/openzeppelin-solidity/contracts/ownership/Secondary.sol";
 import "../node_modules/openzeppelin-solidity/contracts/math/SafeMath.sol";
 import "./contractFacades/ERC20Like.sol";
-import "./Behodler.sol";
+import "./contractFacades/BehodlerLike.sol";
 import "./contractFacades/WethLike.sol";
 
 
@@ -14,7 +14,7 @@ import "./contractFacades/WethLike.sol";
  */
 
 contract Janus is Secondary {
-    Behodler public behodler;
+    BehodlerLike public behodler;
     address public scarcityAddress;
     WethLike public weth;
     using SafeMath for uint256;
@@ -33,7 +33,7 @@ contract Janus is Secondary {
     ) external onlyPrimary {
         weth = WethLike(wet);
         scarcityAddress = scx;
-        behodler = Behodler(beh);
+        behodler = BehodlerLike(beh);
     }
 
     function addLiquidityTokens(
