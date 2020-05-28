@@ -10,3 +10,6 @@ then 1 eth will buy 1 eth with decimal places.
 
 Fee exemption:
 Right now Kharon is simple but in the future, it can be swapped out for something that allows for fee exemption
+
+
+Add liquidity tests.

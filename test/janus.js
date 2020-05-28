@@ -1,7 +1,7 @@
 
 const async = require('./helpers/async.js')
 const expectThrow = require('./helpers/expectThrow').handle
-
+const bigNumber = require('bignumber.js')
 const test = async.test
 const setup = async.setup
 const scarcity = artifacts.require("Scarcity")
@@ -139,7 +139,7 @@ contract('Janus', accounts => {
 		await mock1Instance.approve(behodlerInstance.address, amountToBuy, primaryOptions)
 		await mock2Instance.approve(behodlerInstance.address, amountToBuy, primaryOptions)
 
-		
+
 		await janusInstance.tokenToToken(mock2Instance.address, mock1Instance.address, amountToBuy, 0, upperLimit)
 		await janusInstance.tokenToToken(mock1Instance.address, mock2Instance.address, amountToBuy, 0, upperLimit)
 
@@ -153,78 +153,99 @@ contract('Janus', accounts => {
 		await mock1Instance.approve(behodlerInstance.address, amountToBuy, primaryOptions)
 		await mock2Instance.approve(behodlerInstance.address, amountToBuy, primaryOptions)
 
-		
+
 		await janusInstance.tokenToToken(mock2Instance.address, mock1Instance.address, amountToBuy, 0, upperLimit)
 		await janusInstance.tokenToToken(mock1Instance.address, mock2Instance.address, amountToBuy, 0, upperLimit)
 
 		averagePriceOfMock1 = await behodlerInstance.calculateAverageScarcityPerToken(mock1Instance.address, amountToBuy)
 		averagePriceOfMock2 = await behodlerInstance.calculateAverageScarcityPerToken(mock2Instance.address, amountToBuy)
 
-		assert.equal(averagePriceOfMock1.toString(), "9870371613",averagePriceOfMock2.toString())
+		assert.equal(averagePriceOfMock1.toString(), "9870371613", averagePriceOfMock2.toString())
 		assert.equal(averagePriceOfMock2.toString(), "118464946764")
 
 
 		await mock1Instance.approve(behodlerInstance.address, amountToBuy, primaryOptions)
 		await mock2Instance.approve(behodlerInstance.address, amountToBuy, primaryOptions)
 
-		
+
 		await janusInstance.tokenToToken(mock2Instance.address, mock1Instance.address, amountToBuy, 0, upperLimit)
 		await janusInstance.tokenToToken(mock1Instance.address, mock2Instance.address, amountToBuy, 0, upperLimit)
 
 		averagePriceOfMock1 = await behodlerInstance.calculateAverageScarcityPerToken(mock1Instance.address, amountToBuy)
 		averagePriceOfMock2 = await behodlerInstance.calculateAverageScarcityPerToken(mock2Instance.address, amountToBuy)
 
-		assert.equal(averagePriceOfMock1.toString(), "9929774873",averagePriceOfMock2.toString())
+		assert.equal(averagePriceOfMock1.toString(), "9929774873", averagePriceOfMock2.toString())
 		assert.equal(averagePriceOfMock2.toString(), "110586953848")
 
 		amountToBuy = "10000"
 
 		await mock1Instance.approve(behodlerInstance.address, amountToBuy, primaryOptions)
 		await mock2Instance.approve(behodlerInstance.address, amountToBuy, primaryOptions)
-		
+
 		await janusInstance.tokenToToken(mock2Instance.address, mock1Instance.address, amountToBuy, 0, 0)
 		await janusInstance.tokenToToken(mock1Instance.address, mock2Instance.address, amountToBuy, 0, 0)
 
 		averagePriceOfMock1 = await behodlerInstance.calculateAverageScarcityPerToken(mock1Instance.address, amountToBuy)
 		averagePriceOfMock2 = await behodlerInstance.calculateAverageScarcityPerToken(mock2Instance.address, amountToBuy)
 
-		assert.equal(averagePriceOfMock1.toString(), "9931566188",averagePriceOfMock2.toString())
+		assert.equal(averagePriceOfMock1.toString(), "9931566188", averagePriceOfMock2.toString())
 		assert.equal(averagePriceOfMock2.toString(), "114601687265")
 
 		await mock1Instance.approve(behodlerInstance.address, amountToBuy, primaryOptions)
 		await mock2Instance.approve(behodlerInstance.address, amountToBuy, primaryOptions)
-		
+
 		await janusInstance.tokenToToken(mock2Instance.address, mock1Instance.address, amountToBuy, 0, 0)
 		await janusInstance.tokenToToken(mock1Instance.address, mock2Instance.address, amountToBuy, 0, 0)
 
 		averagePriceOfMock1 = await behodlerInstance.calculateAverageScarcityPerToken(mock1Instance.address, amountToBuy)
 		averagePriceOfMock2 = await behodlerInstance.calculateAverageScarcityPerToken(mock2Instance.address, amountToBuy)
 
-		assert.equal(averagePriceOfMock1.toString(), "9931566188",averagePriceOfMock2.toString())
+		assert.equal(averagePriceOfMock1.toString(), "9931566188", averagePriceOfMock2.toString())
 		assert.equal(averagePriceOfMock2.toString(), "114601638769")
 
 		await mock1Instance.approve(behodlerInstance.address, amountToBuy, primaryOptions)
 		await mock2Instance.approve(behodlerInstance.address, amountToBuy, primaryOptions)
-		
+
 		await janusInstance.tokenToToken(mock2Instance.address, mock1Instance.address, amountToBuy, 0, 0)
 		await janusInstance.tokenToToken(mock1Instance.address, mock2Instance.address, amountToBuy, 0, 0)
 
 		averagePriceOfMock1 = await behodlerInstance.calculateAverageScarcityPerToken(mock1Instance.address, amountToBuy)
 		averagePriceOfMock2 = await behodlerInstance.calculateAverageScarcityPerToken(mock2Instance.address, amountToBuy)
 
-		assert.equal(averagePriceOfMock1.toString(), "9931566188",averagePriceOfMock2.toString())
+		assert.equal(averagePriceOfMock1.toString(), "9931566188", averagePriceOfMock2.toString())
 		assert.equal(averagePriceOfMock2.toString(), "114601592573")
 
 		await mock1Instance.approve(behodlerInstance.address, amountToBuy, primaryOptions)
 		await mock2Instance.approve(behodlerInstance.address, amountToBuy, primaryOptions)
-		
+
 		await janusInstance.tokenToToken(mock2Instance.address, mock1Instance.address, amountToBuy, 0, 0)
 		await janusInstance.tokenToToken(mock1Instance.address, mock2Instance.address, amountToBuy, 0, 0)
 
 		averagePriceOfMock1 = await behodlerInstance.calculateAverageScarcityPerToken(mock1Instance.address, amountToBuy)
 		averagePriceOfMock2 = await behodlerInstance.calculateAverageScarcityPerToken(mock2Instance.address, amountToBuy)
 
-		assert.equal(averagePriceOfMock1.toString(), "9931566188",averagePriceOfMock2.toString())
+		assert.equal(averagePriceOfMock1.toString(), "9931566188", averagePriceOfMock2.toString())
 		assert.equal(averagePriceOfMock2.toString(), "114601548568")
+	})
+
+	test("add liquidity should increase scarcity price of both tokens", async () => {
+
+		await mock1Instance.approve(behodlerInstance.address, "1000", primaryOptions)
+		await mock2Instance.approve(behodlerInstance.address, "1000", primaryOptions)
+		const scarcityPriceOfMock1 = new bigNumber(await behodlerInstance.calculateAverageScarcityPerToken(mock1Instance.address, 10))
+		const scarcityPriceOfMock2 = new bigNumber(await behodlerInstance.calculateAverageScarcityPerToken(mock2Instance.address, 10))
+
+		await janusInstance.addLiquidityTokens(mock1Instance.address, mock2Instance.address, '100', '200')
+
+		const scarcityPriceOfMock1After = bigNumber(await behodlerInstance.calculateAverageScarcityPerToken(mock1Instance.address, 10))
+		const scarcityPriceOfMock2After = bigNumber(await behodlerInstance.calculateAverageScarcityPerToken(mock2Instance.address, 10))
+
+		assert.isTrue(scarcityPriceOfMock1After.isLessThan(scarcityPriceOfMock1), `after: ${scarcityPriceOfMock1After.toString()}, before: ${scarcityPriceOfMock1.toString()}`)
+		assert.isTrue(scarcityPriceOfMock2After.isLessThan(scarcityPriceOfMock2))
+
+		const ratioBefore = scarcityPriceOfMock1.dividedBy(scarcityPriceOfMock2)
+		const ratioAfter = scarcityPriceOfMock1After.dividedBy(scarcityPriceOfMock2After)
+
+		assert.isTrue(ratioBefore.isLessThan(ratioAfter), `before: ${ratioBefore.toString()}, after: ${ratioAfter.toString()}`)
 	})
 })
