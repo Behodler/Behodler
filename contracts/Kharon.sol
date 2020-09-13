@@ -56,11 +56,7 @@ contract Kharon is Secondary{
 	}
 
 	function toll(address token, uint value) public view returns (uint){//percentage expressed as number between 0 and 1000
-		//if the token isn't scarcity, we burn toll rate. If it is scarcity, we first check if we should burn anymore
-		if(token != scarcityAddress || behodler.tokenScarcityObligations(token) <= scarcityBurnCuttoff){
 			return uint(tollRate).mul(value).div(1000);
-		}
-		return 0;
 	}
 
 	function demandPaymentRewardDryRun(address token, uint value) external view returns (uint) {
@@ -72,38 +68,25 @@ contract Kharon is Secondary{
 		return reward;
 	}
 
-	function demandPayment (address token, uint value, address buyer) external returns (uint tollValue) {
+	function demandPayment (address token, uint value, address buyer) external returns (uint tollValue) { //burns dai, weidai and scx and nothing else
 		require(msg.sender == address(behodler), "only Behodler can invoke this function");
-		tollValue = toll(token,value);
+		tollValue = uint(tollRate).mul(value).div(1000);
 		if(tollValue == 0)
 			return 0;
 
+		if (tokenRegistry.baseTokenMapping(token) != address(0))
+			return 0;
+
 		require(ERC20Like(token).transferFrom(msg.sender, address(this), tollValue),"toll taking failed");
-		ERC20Like(token).approve(address(prometheus),uint(-1));
-		uint reward = prometheus.stealFlame(token,tollValue, buyer);
-		uint netToll = tollValue.sub(reward);
-		//get split rate and calculate portion to burn. Remaining is a donation
-		uint donationSplit = PatienceRegulationEngine.getDonationSplit(buyer);
-		uint netSplitRate = uint(100).sub(donationSplit);
-		uint amountToBurn = netToll.mul(netSplitRate).div(100);
+	
 		if(token == Dai){
 			ERC20Like(token).approve(WeiDaiBank,uint(-1));
-			PatienceRegulationEngine.buyWeiDai(netToll,donationSplit);
+			PatienceRegulationEngine.buyWeiDai(tollValue,10);
 			PatienceRegulationEngine.claimWeiDai();
 		}else if(token == scarcityAddress) {
-			Scarcity(token).burn(netToll);
+			Scarcity(token).burn(tollValue);
 		}else if(token == weidaiAddress){
-			uint thisDonationSplit = PatienceRegulationEngine.getDonationSplit(address(this));
-			PatienceRegulationEngine.setDonationSplit(donationSplit);
-			WeiDaiLike(token).burn(address(this), netToll);
-			PatienceRegulationEngine.setDonationSplit(thisDonationSplit);
-		}
-		 else if(tokenRegistry.baseTokenMapping(token) != address(0)){
-			ERC20Like(token).approve(address(bellows),amountToBurn);
-			bellows.open(token,amountToBurn);
-		}
-		else {
-			revert("invalid token trade.");
+			WeiDaiLike(token).burn(address(this), tollValue);
 		}
 	}
 
