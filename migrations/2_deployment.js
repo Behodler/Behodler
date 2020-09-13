@@ -13,6 +13,7 @@ const Janus = artifacts.require('Janus')
 const Chronos = artifacts.require('Chronos')
 const Bellows = artifacts.require('Bellows')
 const Registry = artifacts.require('PyroTokenRegistry')
+const FeeSplitter = artifacts.require('FeeSplitter')
 const MockBehodler = artifacts.require("MockBehodler")
 const messageObjectFileLocation = '../messageLocation.json'
 const fs = require('fs')
@@ -94,7 +95,7 @@ module.exports = async function (deployer, network, accounts) {
 		await deployer.deploy(MockInvalidToken)
 		await deployer.deploy(MockWeth)
 		await deployer.deploy(MockBehodler)
-
+		await deployer.deploy(FeeSplitter, accounts[3])
 
 		mock1Instance = await MockToken1.deployed()
 		mock2Instance = await MockToken2.deployed()
