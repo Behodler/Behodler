@@ -97,10 +97,12 @@ contract Kharon is Secondary {
             msg.sender == address(behodler),
             "only Behodler can invoke this function"
         );
-        tollValue = uint256(tollRate).mul(value).div(1000);
-        if (tollValue == 0) return 0;
+    
         if (token != weidaiAddress && token != Dai && token != scarcityAddress)
             return 0;
+
+    	tollValue = uint256(tollRate).mul(value).div(1000);
+        if (tollValue == 0) return 0;
 
         require(
             ERC20Like(token).transferFrom(msg.sender, address(this), tollValue),
