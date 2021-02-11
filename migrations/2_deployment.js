@@ -7,6 +7,7 @@ const MockToken3 = artifacts.require('MockToken3')
 const MockToken4 = artifacts.require('MockToken4')
 const MockInvalidToken = artifacts.require('MockInvalidToken')
 const MockWeth = artifacts.require('MockWeth')
+const FOTToken = artifacts.require('FeeOnTransferToken')
 const Kharon = artifacts.require('Kharon')
 const Prometheus = artifacts.require('Prometheus')
 const Janus = artifacts.require('Janus')
@@ -16,12 +17,23 @@ const Registry = artifacts.require('PyroTokenRegistry')
 const FeeSplitter = artifacts.require('FeeSplitter')
 const MockBehodler = artifacts.require("MockBehodler")
 const messageObjectFileLocation = '../messageLocation.json'
+const daiJSONLocation = './migrations/ABIs/MockDai.json'
+const weiDaiJSONLocation = './migrations/ABIs/WeiDai.json'
+
+const Web3EthContract = require('web3-eth-contract');
+const redis = require('redis')
+const client = redis.createClient();
+client.on('error', console.log)
+
 const fs = require('fs')
 const seed = true
 module.exports = async function (deployer, network, accounts) {
-	var scarcityInstance, lachesisInstance, behodlerInstance, mock1Instance, mock2Instance, mock3Instance, mock4Instance, mockWethInstance, mockInvalidTokenInstance
+	Web3EthContract.setProvider('https://localhost:8545');
+	var scarcityInstance, lachesisInstance, behodlerInstance, mock1Instance, mock2Instance, mock3Instance, mock4Instance, mockWethInstance, mockInvalidTokenInstance, fotTokenInstance
 	var kharonInstance, prometheusInstance, janusInstance, chronosInstance, bellowsInstance, registryInstance, mockBehodlerInstance
 	let contractList = []
+	const daiJSON = JSON.parse(fs.readFileSync(daiJSONLocation, 'utf-8'))
+	const weidaiJSON = JSON.parse(fs.readFileSync(weiDaiJSONLocation, 'utf-8'))
 	await pausePromise('scarcity pause')
 	await deployer.deploy(Scarcity)
 	await pausePromise('Lachesis pause')
@@ -40,7 +52,7 @@ module.exports = async function (deployer, network, accounts) {
 	await deployer.deploy(Bellows)
 	await pausePromise('Registry pause')
 	await deployer.deploy(Registry)
-
+	console.log('Given Accounts: ' + JSON.stringify(accounts))
 	scarcityInstance = await Scarcity.deployed()
 	console.log('scarcity address: ' + scarcityInstance.address)
 	lachesisInstance = await Lachesis.deployed()
@@ -51,6 +63,10 @@ module.exports = async function (deployer, network, accounts) {
 	chronosInstance = await Chronos.deployed()
 	bellowsInstance = await Bellows.deployed()
 	registryInstance = await Registry.deployed()
+
+	client.set('behodler1', behodlerInstance.address)
+	client.set('lachesis1', lachesisInstance.address)
+	client.set('scarcity1', scarcityInstance.address)
 
 	contractList.push({ name: 'Behodler', address: behodlerInstance.address })
 	contractList.push({ name: 'Bellows', address: bellowsInstance.address })
@@ -87,12 +103,15 @@ module.exports = async function (deployer, network, accounts) {
 		weiDaiAddress = contracts.weiDai;
 		bankAddress = contracts.bank
 		preAddress = contracts.pre
+		client.set('dai', daiAddress)
+		client.set('weidai', weiDaiAddress)
 
 		await deployer.deploy(MockToken1)
 		await deployer.deploy(MockToken2)
 		await deployer.deploy(MockToken3)
 		await deployer.deploy(MockToken4)
 		await deployer.deploy(MockInvalidToken)
+		await deployer.deploy(FOTToken)
 		await deployer.deploy(MockWeth)
 		await deployer.deploy(MockBehodler)
 		await deployer.deploy(FeeSplitter, accounts[3])
@@ -101,18 +120,26 @@ module.exports = async function (deployer, network, accounts) {
 		mock2Instance = await MockToken2.deployed()
 		mock3Instance = await MockToken3.deployed()
 		mock4Instance = await MockToken4.deployed()
+		fotTokenInstance = await FOTToken.deployed()
 
 		mockWethInstance = await MockWeth.deployed()
 		mockInvalidTokenInstance = await MockInvalidToken.deployed()
 		mockBehodlerInstance = await MockBehodler.deployed()
 		wethAddress = mockWethInstance.address
 
+		client.set('mock1Token', mock1Instance.address)
+		client.set('mock2Token', mock2Instance.address)
+		client.set('mock3Token', mock3Instance.address)
+		client.set('eye', mock4Instance.address)
+		client.set('mockWeth', wethAddress)
+		client.set('fotToken', fotTokenInstance.address)
 		donationAddress = accounts[5]
 
 		contractList.push({ name: 'MockToken1', address: mock1Instance.address })
 		contractList.push({ name: 'MockToken2', address: mock2Instance.address })
 		contractList.push({ name: 'MockToken3', address: mock3Instance.address })
 		contractList.push({ name: 'MockToken4', address: mock4Instance.address })
+		contractList.push({ name: 'FeeOnTransferToken', address: fotTokenInstance.address })
 		contractList.push({ name: 'MockWeth', address: mockWethInstance.address })
 		contractList.push({ name: 'MockBehodler', address: mockBehodlerInstance.address })
 		contractList.push({ name: 'ERC20', address: daiAddress })
@@ -124,7 +151,11 @@ module.exports = async function (deployer, network, accounts) {
 		await lachesisInstance.measure(mock2Instance.address, true)
 		await lachesisInstance.measure(mock3Instance.address, true)
 		await lachesisInstance.measure(mock4Instance.address, true)
+		await lachesisInstance.measure(fotTokenInstance.address, true)
 		await lachesisInstance.measure(mockWethInstance.address, true)
+		await lachesisInstance.measure(weiDaiAddress, true)
+		await lachesisInstance.measure(daiAddress, true)
+
 
 		await registryInstance.addToken("pyroMock1", "PMC1", mock1Instance.address)
 		await registryInstance.addToken("pyroMock2", "PMC2", mock2Instance.address)
@@ -191,11 +222,43 @@ module.exports = async function (deployer, network, accounts) {
 		await pausePromise('seeding prometheus')
 		await prometheusInstance.seed(kharonInstance.address, scarcityInstance.address, weiDaiAddress, daiAddress, registryInstance.address)
 		await pausePromise('seeding kharon')
+		console.log(`BEHODLER: pre address ${preAddress}, bank address ${bankAddress}`)
 		await kharonInstance.seed(bellowsInstance.address, behodlerInstance.address, prometheusInstance.address, preAddress, bankAddress, daiAddress, weiDaiAddress, scarcityInstance.address, '10000000000000000000000000', donationAddress)
 		await pausePromise('seeding janus')
 		await janusInstance.seed(scarcityInstance.address, wethAddress, behodlerInstance.address)
 	}
 	writeScarcityLocationForSisyphus(scarcityInstance.address)
+	client.quit()
+
+	//BEGIN MORGOTH ASSISTANCE
+	console.log('SETTING UP MORGOTH')
+
+	// const daiInstance = await new Web3EthContract(daiJSON.abi, daiAddress);
+	// const weiDaiInstance = await new Web3EthContract(weidaiJSON.abi, weiDaiAddress);
+
+	// await daiInstance.methods.approve(behodlerInstance.address, '115792089237316000000000000000000000000000000000000000000000000000000000000000').send({ from: accounts[0] })
+	// await weiDaiInstance.methods.approve(behodlerInstance.address, '115792089237316000000000000000000000000000000000000000000000000000000000000000').send({ from: accounts[0] })
+
+	await mock1Instance.approve(behodlerInstance.address, '115792089237316000000000000000000000000000000000000000000000000000000000000000', { from: accounts[0] })
+	await mock2Instance.approve(behodlerInstance.address, '115792089237316000000000000000000000000000000000000000000000000000000000000000', { from: accounts[0] })
+	await mock3Instance.approve(behodlerInstance.address, '115792089237316000000000000000000000000000000000000000000000000000000000000000', { from: accounts[0] })
+	await mock4Instance.approve(behodlerInstance.address, '115792089237316000000000000000000000000000000000000000000000000000000000000000', { from: accounts[0] })
+	await mockWethInstance.approve(behodlerInstance.address, '115792089237316000000000000000000000000000000000000000000000000000000000000000', { from: accounts[0] })
+	await fotTokenInstance.approve(behodlerInstance.address, '115792089237316000000000000000000000000000000000000000000000000000000000000000', { from: accounts[0] })
+
+	console.log('PRESEEDING BEHODLER WITH LIQUIDITY')
+	const ONE = '1000000000000000000'
+	const TWO = '2000000000000000000'
+	const NaughtPointOne = '100000000000000000'
+	await behodlerInstance.buyScarcity(mock1Instance.address, ONE + '00', 0, { from: accounts[0] })
+	await behodlerInstance.buyScarcity(mock2Instance.address, TWO + '00', 0, { from: accounts[0] })
+	await behodlerInstance.buyScarcity(mock3Instance.address, TWO + '000', 0, { from: accounts[0] })
+	await behodlerInstance.buyScarcity(mock4Instance.address, ONE + '0000', 0, { from: accounts[0] })
+	// await behodlerInstance.buyScarcity(daiAddress, ONE + '0', 0, { from: accounts[0] })
+	// await behodlerInstance.buyScarcity(weiDaiAddress, NaughtPointOne, 0, { from: accounts[0] })
+	//	await behodlerInstance.buyScarcity(fotTokenInstance.address, ONE + '0', 0, { from: accounts[0] })
+	//END MORGOTH ASSISTANCE
+
 }
 
 function pausePromise(message, durationInSeconds = 1) {
@@ -215,7 +278,7 @@ function writeNetworkABIs(network, abiAddressArray) {
 	if (exists) {
 		try {
 			dataObject = JSON.parse(fs.readFileSync(fileLocation))
-		} catch{
+		} catch {
 			dataObject = []
 		}
 	}
