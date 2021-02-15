@@ -123,6 +123,7 @@ module.exports = async function (deployer, network, accounts) {
 		fotTokenInstance = await FOTToken.deployed()
 
 		mockWethInstance = await MockWeth.deployed()
+		client.set('mockWeth1',mockWethInstance.address)
 		mockInvalidTokenInstance = await MockInvalidToken.deployed()
 		mockBehodlerInstance = await MockBehodler.deployed()
 		wethAddress = mockWethInstance.address
